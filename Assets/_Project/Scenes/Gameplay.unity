@@ -2670,7 +2670,7 @@ GameObject:
   - component: {fileID: 45733430}
   m_Layer: 0
   m_Name: BOT 1
-  m_TagString: Player
+  m_TagString: Bot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -102448,8 +102448,8 @@ Transform:
   m_Children:
   - {fileID: 664737094}
   - {fileID: 2080348378}
-  - {fileID: 820123474}
   - {fileID: 1924559762}
+  - {fileID: 820123474}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1591667783
@@ -103283,7 +103283,7 @@ GameObject:
   - component: {fileID: 1602256805}
   m_Layer: 0
   m_Name: BOT 2
-  m_TagString: Player
+  m_TagString: Bot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -118402,6 +118402,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 93870070cdbeb7c408af20187a8c5ed0, type: 2}
   maxActiveQuests: 1
   autoAssignQuests: 1
+  sessionFoodType: 0
+  sessionQuests: []
+  sessionInitialized: 0
   activeQuests: []
   completedQuests: []
 --- !u!1 &1829367210

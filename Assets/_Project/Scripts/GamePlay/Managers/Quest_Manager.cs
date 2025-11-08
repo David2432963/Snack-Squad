@@ -8,9 +8,14 @@ using System;
 public class Quest_Manager : MonoBehaviour
 {
     [Title("Quest Configuration")]
-    [SerializeField] private FoodCollectionQuest[] availableQuests;
+    [SerializeField] private FoodCollectionQuest[] questDatas;
     [SerializeField] private int maxActiveQuests = 3;
     [SerializeField] private bool autoAssignQuests = true;
+
+    [Title("Session Configuration")]
+    [SerializeField, ReadOnly] private EFoodType sessionFoodType;
+    [SerializeField, ReadOnly] private FoodCollectionQuest[] sessionQuests;
+    [SerializeField, ReadOnly] private bool sessionInitialized = false;
 
     [Title("Debug Info")]
     [SerializeField, ReadOnly] private List<QuestProgress> activeQuests = new List<QuestProgress>();
@@ -39,12 +44,52 @@ public class Quest_Manager : MonoBehaviour
     {
         // Subscribe to food collection events
         Main.Observer.Add(EEvent.OnGoodFoodCollected, OnGoodFoodCollected);
+        // Auto-load quests if array is empty
+        if (questDatas == null || questDatas.Length == 0)
+        {
+            LoadQuestsFromAssets();
+        }
+        SelectRandomSessionFoodType();
+    }
 
-        // Auto-assign initial quests if enabled
+    private void SelectRandomSessionFoodType()
+    {
+        var foodTypes = Enum.GetValues(typeof(EFoodType));
+        var data = (EFoodType)foodTypes.GetValue(UnityEngine.Random.Range(0, foodTypes.Length));
+        InitializeWithSessionFoodType(data);
+    }
+
+    private void InitializeWithSessionFoodType(EFoodType foodType)
+    {
+        sessionFoodType = foodType;
+        sessionInitialized = true;
+
+        FilterQuestsForSession();
+
         if (autoAssignQuests)
         {
             AssignRandomQuests();
         }
+    }
+
+    private void FilterQuestsForSession()
+    {
+        if (questDatas == null || questDatas.Length == 0)
+        {
+            sessionQuests = new FoodCollectionQuest[0];
+            return;
+        }
+
+        var filteredQuests = new List<FoodCollectionQuest>();
+        foreach (var quest in questDatas)
+        {
+            if (quest.RequiredFoodType == sessionFoodType)
+            {
+                filteredQuests.Add(quest);
+            }
+        }
+
+        sessionQuests = filteredQuests.ToArray();
     }
 
     private void OnDestroy()
@@ -71,91 +116,71 @@ public class Quest_Manager : MonoBehaviour
     {
 #if UNITY_EDITOR
         string searchPath = "Assets/_Project/Datas/NormalQuestData";
-        Debug.Log($"[Quest_Manager] Searching for FoodCollectionQuest assets in: {searchPath}");
-
         string[] guids = UnityEditor.AssetDatabase.FindAssets("t:FoodCollectionQuest", new[] { searchPath });
         List<FoodCollectionQuest> foundQuests = new List<FoodCollectionQuest>();
-
-        Debug.Log($"[Quest_Manager] Found {guids.Length} quest asset GUIDs");
 
         foreach (string guid in guids)
         {
             string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
-            Debug.Log($"[Quest_Manager] Loading quest from path: {path}");
-
             FoodCollectionQuest quest = UnityEditor.AssetDatabase.LoadAssetAtPath<FoodCollectionQuest>(path);
             if (quest != null)
             {
                 foundQuests.Add(quest);
-                Debug.Log($"[Quest_Manager] Successfully loaded quest: {quest.QuestName} (Type: {quest.RequiredFoodType})");
-            }
-            else
-            {
-                Debug.LogWarning($"[Quest_Manager] Failed to load quest from path: {path}");
             }
         }
 
-        availableQuests = foundQuests.ToArray();
-        Debug.Log($"[Quest_Manager] ✓ Successfully loaded {availableQuests.Length} quests from {searchPath}");
+        questDatas = foundQuests.ToArray();
 
-        // Group by food type for better organization in logs
-        var questsByType = foundQuests.GroupBy(q => q.RequiredFoodType);
-        foreach (var group in questsByType)
+        // Re-filter quests if session is already initialized
+        if (sessionInitialized)
         {
-            Debug.Log($"[Quest_Manager] {group.Key} quests: {group.Count()}");
-            foreach (var quest in group)
-            {
-                Debug.Log($"[Quest_Manager]   - {quest.QuestName}");
-            }
+            FilterQuestsForSession();
         }
-#else
-        Debug.LogWarning("LoadQuestsFromAssets only works in Unity Editor");
 #endif
     }
 
-    public void AssignRandomQuests()
+    private void AssignRandomQuests()
     {
-        if (availableQuests == null || availableQuests.Length == 0)
+        if (!sessionInitialized)
         {
-            Debug.LogWarning("No available quests to assign!");
             return;
         }
 
-        Debug.Log($"[Quest_Manager] Assigning random quests. Current active: {activeQuests.Count}, Max: {maxActiveQuests}");
-
-        // Fill up to max active quests
-        while (activeQuests.Count < maxActiveQuests && availableQuests.Length > 0)
+        if (sessionQuests == null || sessionQuests.Length == 0)
         {
-            var randomQuest = availableQuests[UnityEngine.Random.Range(0, availableQuests.Length)];
-            Debug.Log($"[Quest_Manager] Attempting to add quest: {randomQuest.QuestName}");
-            AddQuest(randomQuest);
+            return;
         }
 
-        Debug.Log($"[Quest_Manager] Quest assignment complete. Active quests: {activeQuests.Count}");
+        while (activeQuests.Count < maxActiveQuests && sessionQuests.Length > 0)
+        {
+            var randomQuest = sessionQuests[UnityEngine.Random.Range(0, sessionQuests.Length)];
+            bool added = AddQuest(randomQuest);
+
+            // Break if we can't add any more quests to prevent infinite loop
+            if (!added)
+            {
+                break;
+            }
+        }
     }
 
-    public bool AddQuest(FoodCollectionQuest quest)
+    private bool AddQuest(FoodCollectionQuest quest)
     {
-        HPDebug.Log("Adding quest...");
         if (quest == null)
         {
-            Debug.LogWarning("Cannot add null quest!");
             return false;
         }
 
         if (activeQuests.Count >= maxActiveQuests)
         {
-            Debug.LogWarning($"Cannot add quest '{quest.QuestName}' - maximum active quests reached ({maxActiveQuests})!");
             return false;
         }
 
         if (IsQuestActive(quest))
         {
-            Debug.LogWarning($"Quest '{quest.QuestName}' is already active!");
             return false;
         }
 
-        // Generate random specific items since all quests are now multi-item collection
         if (quest.SelectedSpecificItems.Count == 0)
         {
             quest.GenerateRandomSpecificItems();
@@ -164,31 +189,27 @@ public class Quest_Manager : MonoBehaviour
         var questProgress = new QuestProgress(quest);
         SubscribeToQuestEvents(questProgress);
         activeQuests.Add(questProgress);
-        HPDebug.Log("Adding quest done");
 
         OnQuestAdded?.Invoke(questProgress);
 
-        Debug.Log($"Quest '{quest.QuestName}' added! Target: {string.Join(", ", quest.GetRequiredItemNames())}");
         return true;
     }
 
-    public bool RemoveQuest(FoodCollectionQuest quest)
+    private bool RemoveQuest(FoodCollectionQuest quest)
     {
         var questProgress = GetActiveQuestProgress(quest);
         if (questProgress == null)
         {
-            Debug.LogWarning($"Quest '{quest.QuestName}' is not active!");
             return false;
         }
 
         UnsubscribeFromQuestEvents(questProgress);
         activeQuests.Remove(questProgress);
 
-        Debug.Log($"Quest '{quest.QuestName}' removed!");
         return true;
     }
 
-    public void CompleteQuest(QuestProgress questProgress)
+    private void CompleteQuest(QuestProgress questProgress)
     {
         if (!activeQuests.Contains(questProgress)) return;
 
@@ -198,15 +219,21 @@ public class Quest_Manager : MonoBehaviour
 
         OnQuestCompleted?.Invoke(questProgress);
 
-        // Auto-assign new quest if enabled - but only assign ONE quest to prevent cascading
-        if (autoAssignQuests && activeQuests.Count < maxActiveQuests)
+        // Notify daily quest system about completed normal quest
+        if (DailyQuest_Manager.Instance != null)
         {
-            var randomQuest = availableQuests[UnityEngine.Random.Range(0, availableQuests.Length)];
+            DailyQuest_Manager.Instance.NotifyNormalQuestCompleted();
+        }
+
+        // Auto-assign new quest if enabled - but only assign ONE quest to prevent cascading
+        if (autoAssignQuests && activeQuests.Count < maxActiveQuests && sessionQuests.Length > 0)
+        {
+            var randomQuest = sessionQuests[UnityEngine.Random.Range(0, sessionQuests.Length)];
             AddQuest(randomQuest);
         }
     }
 
-    public void ClaimQuestReward(FoodCollectionQuest quest)
+    private void ClaimQuestReward(FoodCollectionQuest quest)
     {
         var questProgress = GetCompletedQuestProgress(quest);
         if (questProgress != null)
@@ -221,51 +248,32 @@ public class Quest_Manager : MonoBehaviour
 
     private void OnGoodFoodCollected(object data)
     {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-        Debug.Log($"[Quest_Manager] OnGoodFoodCollected called with data: {data}");
-#endif
-
-        if (data is GoodFood food)
+        if (data is FoodCollectionData collectionData)
         {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Debug.Log($"[Quest_Manager] Food type: {food.GetType().Name}, FoodType: {food.FoodType}");
-#endif
-            ProcessFoodCollection(food);
+            if (collectionData.playerType == EPlayerType.MainPlayer)
+            {
+                ProcessFoodCollection(collectionData.food);
+            }
         }
-        else
+        else if (data is GoodFood food)
         {
-            Debug.LogWarning($"[Quest_Manager] Unexpected data type in OnGoodFoodCollected: {data?.GetType().Name}");
+            ProcessFoodCollection(food);
         }
     }
 
     private void ProcessFoodCollection(GoodFood food)
     {
         EFoodType foodType = food.FoodType;
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-        Debug.Log($"[Quest_Manager] Processing food collection: {foodType}");
-#endif
 
-        // Update progress for all active quests that match this food type
-        foreach (var questProgress in activeQuests.ToList()) // ToList to avoid modification during iteration
+        foreach (var questProgress in activeQuests.ToList())
         {
             if (questProgress.Quest.RequiredFoodType == foodType)
             {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log($"[Quest_Manager] Found matching quest: {questProgress.Quest.QuestName}");
-#endif
-
-                // All quests are now multi-item collection quests
                 int specificItemValue = GetSpecificItemValue(food);
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log($"[Quest_Manager] Specific item value: {specificItemValue}");
-#endif
 
                 if (specificItemValue != -1)
                 {
-                    bool wasAdded = questProgress.AddSpecificItem(specificItemValue);
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    Debug.Log($"[Quest_Manager] Specific item added to quest: {wasAdded}");
-#endif
+                    questProgress.AddSpecificItem(specificItemValue);
                 }
             }
         }
@@ -278,39 +286,19 @@ public class Quest_Manager : MonoBehaviour
             case EFoodType.Fruit:
                 if (food is Fruit fruitFood)
                 {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    Debug.Log($"[Quest_Manager] Fruit detected: {fruitFood.FruitType} (value: {(int)fruitFood.FruitType})");
-#endif
                     return (int)fruitFood.FruitType;
-                }
-                else
-                {
-                    Debug.LogWarning($"[Quest_Manager] Food marked as Fruit but is not Fruit class: {food.GetType().Name}");
                 }
                 break;
             case EFoodType.FastFood:
                 if (food is FastFood fastFood)
                 {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    Debug.Log($"[Quest_Manager] FastFood detected: {fastFood.FastFoodType} (value: {(int)fastFood.FastFoodType})");
-#endif
                     return (int)fastFood.FastFoodType;
-                }
-                else
-                {
-                    Debug.LogWarning($"[Quest_Manager] Food marked as FastFood but is not FastFood class: {food.GetType().Name}");
                 }
                 break;
             case EFoodType.Cake:
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log($"[Quest_Manager] Cake type not yet implemented");
-#endif
-                break;
-            default:
-                Debug.LogWarning($"[Quest_Manager] Unknown food type: {food.FoodType}");
                 break;
         }
-        return -1; // Invalid or unsupported food type
+        return -1;
     }
 
     private void SubscribeToQuestEvents(QuestProgress questProgress)

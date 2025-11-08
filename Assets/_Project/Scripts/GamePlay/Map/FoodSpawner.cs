@@ -35,86 +35,65 @@ public class FoodSpawner : MonoBehaviour
     }
     private void Start()
     {
-        // Subscribe to session food type selection
-        Main.Observer.Add("OnSessionFoodTypeSelected", OnSessionFoodTypeSelected);
-        
-        // If GameData_Manager is already initialized, get the food type immediately
-        if (GameData_Manager.Instance != null)
-        {
-            InitializeWithFoodType(GameData_Manager.Instance.CurrentSessionFoodType);
-        }
+        // Randomly select food type for this session
+        InitializeRandomFoodType();
         
         StartCoroutine(nameof(IECheckSpawnFood));
         Main.Observer.Add(EEvent.OnGoodFoodCollected, OnRemoveFood);
         Main.Observer.Add(EEvent.OnBadFoodCollected, OnRemoveBadFood);
 
         CheckEmptyTiles();
-        
-        // Only spawn if food type is already initialized
-        if (foodTypeInitialized)
-        {
-            SpawnFood();
-        }
+        SpawnFood();
     }
 
-    private void OnSessionFoodTypeSelected(object data)
+    private void InitializeRandomFoodType()
     {
-        if (data is EFoodType foodType)
+        // Get all available food types (excluding Cake if not implemented)
+        List<EFoodType> availableFoodTypes = new List<EFoodType>
         {
-            InitializeWithFoodType(foodType);
-        }
-    }
+            EFoodType.Fruit,
+            EFoodType.FastFood
+            // EFoodType.Cake // Uncomment when cake system is implemented
+        };
 
-    private void InitializeWithFoodType(EFoodType foodType)
-    {
-        sessionFoodType = foodType;
+        // Randomly select one food type for this session
+        sessionFoodType = availableFoodTypes[Random.Range(0, availableFoodTypes.Count)];
         foodTypeInitialized = true;
         
-        Debug.Log($"[FoodSpawner] Session food type set to: {sessionFoodType}");
-        
-        // Clear and setup food prefabs for the selected type
-        foodPrefabs.Clear();
+        // Setup food prefabs for the selected type
         SetupFoodPrefabsForSession();
         
-        // Spawn initial food if we haven't already
-        if (currentGoodFoodCount == 0)
-        {
-            SpawnFood();
-        }
+        // Notify other systems about the selected food type
+        Main.Observer.Notify(EEvent.OnSessionFoodTypeSelected, sessionFoodType);
     }
 
     private void SetupFoodPrefabsForSession()
     {
+        foodPrefabs.Clear();
+        
         switch (sessionFoodType)
         {
             case EFoodType.Fruit:
                 foodPrefabs.AddRange(fruitsPrefabs);
-                Debug.Log($"[FoodSpawner] Added {fruitsPrefabs.Length} fruit prefabs for session");
                 break;
             case EFoodType.FastFood:
                 foodPrefabs.AddRange(fastFoodPrefabs);
-                Debug.Log($"[FoodSpawner] Added {fastFoodPrefabs.Length} fast food prefabs for session");
                 break;
             case EFoodType.Cake:
-                Debug.LogWarning("[FoodSpawner] Cake food type not yet implemented!");
-                break;
-            default:
-                Debug.LogError($"[FoodSpawner] Unknown food type: {sessionFoodType}");
                 break;
         }
     }
+    
     [Button]
     private void SpawnFood()
     {
         if (!foodTypeInitialized)
         {
-            Debug.LogWarning("[FoodSpawner] Cannot spawn food - session food type not initialized yet!");
             return;
         }
 
         if (foodPrefabs.Count == 0)
         {
-            Debug.LogWarning($"[FoodSpawner] No food prefabs available for {sessionFoodType}!");
             return;
         }
 
@@ -129,8 +108,6 @@ public class FoodSpawner : MonoBehaviour
 
             currentGoodFoodCount++;
         }
-        
-        Debug.Log($"[FoodSpawner] Spawned {sessionFoodType} foods. Current count: {currentGoodFoodCount}/{maxGoodFoodToSpawn}");
     }
 
     private void SpawnBadFood()
@@ -179,7 +156,6 @@ public class FoodSpawner : MonoBehaviour
                 spawnedFoods.Add(food);
 
                 currentGoodFoodCount++;
-                Debug.Log($"[FoodSpawner] Auto-spawned {sessionFoodType} food. Count: {currentGoodFoodCount}/{maxGoodFoodToSpawn}");
             }
             if (currentBadFoodCount < maxBadFoodToSpawn && emptyTiles.Count > 0)
             {
@@ -220,7 +196,20 @@ public class FoodSpawner : MonoBehaviour
 
     private void OnRemoveFood(object data)
     {
-        if (data is Food food)
+        Food food = null;
+        
+        // Handle new FoodCollectionData format
+        if (data is FoodCollectionData collectionData)
+        {
+            food = collectionData.food;
+        }
+        // Handle legacy Food format for backward compatibility
+        else if (data is Food legacyFood)
+        {
+            food = legacyFood;
+        }
+        
+        if (food != null)
         {
             spawnedFoods.Remove(food);
         }
@@ -239,6 +228,5 @@ public class FoodSpawner : MonoBehaviour
     {
         Main.Observer.Remove(EEvent.OnGoodFoodCollected, OnRemoveFood);
         Main.Observer.Remove(EEvent.OnBadFoodCollected, OnRemoveBadFood);
-        Main.Observer.Remove("OnSessionFoodTypeSelected", OnSessionFoodTypeSelected);
     }
 }

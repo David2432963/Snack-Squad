@@ -43,7 +43,10 @@ public class GoodFood : Food
         if (isPlayer)
         {
             GameData_Manager.Instance.AddScore(playerType, point);
-            Main.Observer.Notify(EEvent.OnGoodFoodCollected, this);
+            
+            // Pass both food and player type information for quest system
+            var collectionData = new FoodCollectionData(this, playerType);
+            Main.Observer.Notify(EEvent.OnGoodFoodCollected, collectionData);
         }
         
         base.OnTriggerEnter(other);

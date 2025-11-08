@@ -18,6 +18,20 @@ public struct RangeFloat
         return UnityEngine.Random.Range(min, max);
     }
 }
+
+[Serializable]
+public struct FoodCollectionData
+{
+    public GoodFood food;
+    public EPlayerType playerType;
+
+    public FoodCollectionData(GoodFood food, EPlayerType playerType)
+    {
+        this.food = food;
+        this.playerType = playerType;
+    }
+}
+
 public interface IPlayerInput
 {
     Vector2 Movement { get; }
