@@ -1,0 +1,866 @@
+fileFormatVersion: 2
+guid: df0ee021b01bf6345b615f15d1f62670
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 21300000
+    second: Post Office Tileset_126
+  - first:
+      213: 21300002
+    second: Post Office Tileset_90
+  - first:
+      213: 21300004
+    second: Post Office Tileset_124
+  - first:
+      213: 21300006
+    second: Post Office Tileset_131
+  - first:
+      213: 21300008
+    second: Post Office Tileset_81
+  - first:
+      213: 21300010
+    second: Post Office Tileset_71
+  - first:
+      213: 21300012
+    second: Post Office Tileset_133
+  - first:
+      213: 21300014
+    second: Post Office Tileset_125
+  - first:
+      213: 21300016
+    second: Post Office Tileset_89
+  - first:
+      213: 21300018
+    second: Post Office Tileset_55
+  - first:
+      213: 21300020
+    second: Post Office Tileset_54
+  - first:
+      213: 21300022
+    second: Post Office Tileset_155
+  - first:
+      213: 21300024
+    second: Post Office Tileset_170
+  - first:
+      213: 21300026
+    second: Post Office Tileset_127
+  - first:
+      213: 21300028
+    second: Post Office Tileset_80
+  - first:
+      213: 21300030
+    second: Post Office Tileset_134
+  - first:
+      213: 21300032
+    second: Post Office Tileset_72
+  - first:
+      213: 21300034
+    second: Post Office Tileset_163
+  - first:
+      213: 21300036
+    second: Post Office Tileset_63
+  - first:
+      213: 21300038
+    second: Post Office Tileset_132
+  - first:
+      213: 21300040
+    second: Post Office Tileset_154
+  - first:
+      213: 21300042
+    second: Post Office Tileset_162
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 4
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 2
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 0
+  flipbookColumns: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 1
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Post Office Tileset_126
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 288
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 072f22e8f5f34237bc9060168d25429a
+      internalID: 21300000
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_90
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 368
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8d57bb5e44a14a23bb0b5903ce9414f4
+      internalID: 21300002
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_124
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 288
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 72044cd8cddb4b279317e7e9cfe0f897
+      internalID: 21300004
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_131
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 272
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: da95ebf15dea4c76ab7fcc6e10d8bbfa
+      internalID: 21300006
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_81
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 384
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4409d9fffb5341a2a1cf1ad62c79c6e4
+      internalID: 21300008
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_71
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 400
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cabb0d1092aa4a8f907d8de70773fa0f
+      internalID: 21300010
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_133
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 272
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 743c87aaa90d41ff93c3800f246f4f94
+      internalID: 21300012
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_125
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 288
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 46ab4c6b711a4395adce5906cdb644aa
+      internalID: 21300014
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_89
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 368
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92b264c963ea43f99e680b217a377d36
+      internalID: 21300016
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_55
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 432
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f6f596d6cd3f4df1be1e493c2aeca8c7
+      internalID: 21300018
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_54
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 432
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 163f30a2c47048f09d393d256b75ccb9
+      internalID: 21300020
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_155
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 224
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f122828181eb47c0a629b9021a4cdae3
+      internalID: 21300022
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_170
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 192
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc535c815b87415e9270abc4bf870510
+      internalID: 21300024
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_127
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 288
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9413bb6920a8447ca572f273aa91c655
+      internalID: 21300026
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_80
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 384
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0db064a050104e6b9970bf2beadd0a63
+      internalID: 21300028
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_134
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 272
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 84e159a03566448a9fe19e4aa970e688
+      internalID: 21300030
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_72
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 400
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0bc5ccea9de342db98b59c6369dc72be
+      internalID: 21300032
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_163
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 208
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cfd1514bb80541dd8f51ed0806dd0223
+      internalID: 21300034
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_63
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 416
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1123bb40e190483c8cfbec487d58382b
+      internalID: 21300036
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_132
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 272
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 18915ebfe959429fbfcf46c99417d69e
+      internalID: 21300038
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_154
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 224
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f4fe9e4d22994df1b037990e4d695020
+      internalID: 21300040
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Post Office Tileset_162
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 208
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8, y: -8}
+        - {x: -8, y: 8}
+        - {x: 8, y: 8}
+        - {x: 8, y: -8}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b0d8d0cb09da40c1b70f71acd7342f20
+      internalID: 21300042
+      vertices:
+      - {x: 0, y: 16}
+      - {x: 16, y: 16}
+      - {x: 0, y: 0}
+      - {x: 16, y: 0}
+      indices: 000000000100000002000000020000000100000003000000
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Post Office Tileset_124: 21300004
+      Post Office Tileset_125: 21300014
+      Post Office Tileset_126: 21300000
+      Post Office Tileset_127: 21300026
+      Post Office Tileset_131: 21300006
+      Post Office Tileset_132: 21300038
+      Post Office Tileset_133: 21300012
+      Post Office Tileset_134: 21300030
+      Post Office Tileset_154: 21300040
+      Post Office Tileset_155: 21300022
+      Post Office Tileset_162: 21300042
+      Post Office Tileset_163: 21300034
+      Post Office Tileset_170: 21300024
+      Post Office Tileset_54: 21300020
+      Post Office Tileset_55: 21300018
+      Post Office Tileset_63: 21300036
+      Post Office Tileset_71: 21300010
+      Post Office Tileset_72: 21300032
+      Post Office Tileset_80: 21300028
+      Post Office Tileset_81: 21300008
+      Post Office Tileset_89: 21300016
+      Post Office Tileset_90: 21300002
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

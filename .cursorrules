@@ -1,0 +1,107 @@
+# Game1 Unity Project - AI Assistant Instructions
+
+## Project Overview
+This is a Unity 2D game project using the OSK Framework, a custom game development framework. The project follows component-based architecture with factory patterns, scene management, and modular systems.
+
+## Architecture & Patterns
+- **OSK Framework**: Custom framework with Main hub, Director scene management, UI system, and Mono update loop
+- **Component Pattern**: Player/Enemy use composition over inheritance
+- **Factory Pattern**: EnemyFactory for enemy creation with object pooling
+- **Strategy Pattern**: IWeaponFire implementations for different firing modes
+- **Builder Pattern**: SceneLoadBuilder for scene loading configuration
+- **Singleton Pattern**: SingletonManager for scene-specific singletons
+
+## Key Systems
+1. **Scene Management**: OSK Director with async loading, fake duration, and builder pattern
+2. **Character System**: Player (Control/Movement/Weapon/Health) and Enemy (Control/Movement/Attack)
+3. **UI System**: View-based architecture with TransitionUI and RootUI
+4. **Weapon System**: Strategy pattern with SingleFire, BurstFire, CircleFire
+5. **Spawning**: EnemyFactory + EnemySpawner with object pooling
+6. **Input**: Interface-based input abstraction (IPlayerInput)
+
+## Coding Standards
+- **PERFORMANCE FIRST**: Always write optimized, high-performance code
+- **Cache References**: Store component references instead of getting them repeatedly
+- **Avoid Allocations**: Minimize garbage collection in Update loops
+- **Use Object Pooling**: For frequently created/destroyed objects
+- **Optimize Loops**: Use for instead of foreach when possible, break early when conditions met
+- **Memory Efficient**: Reuse variables, avoid creating new objects in hot paths
+- **Profile-Aware**: Consider frame rate impact of all operations
+- Use OSK namespace and framework patterns
+- Register components with `Main.Mono.Register(this)` in Awake()
+- Register singletons with `SingletonManager.Instance.RegisterScene(this)`
+- Use interfaces for extensible systems (IWeaponFire, IPlayerInput, IDamageable)
+- Prefer composition over inheritance
+
+## File Organization
+```
+Assets/_Project/Scripts/
+├── GamePlay/Scripts/
+│   ├── Characters/ (Player & Enemy components)
+│   ├── Weapon/ (Weapon system & fire patterns)
+│   ├── Spawner/ (Factory & Spawner)
+│   ├── Managers/ (Game managers)
+│   └── Interfaces.cs & Enums.cs
+├── MainMenu/Scripts/ (Menu managers & UI)
+└── Splash/Scripts/ (Bootstrap & Loading)
+```
+
+## Third-Party Libraries
+- **DOTween**: For animations and delayed calls
+- **UniTask**: For async/await support
+- **Odin Inspector**: For advanced inspector attributes
+- **OSK Framework**: Custom game framework (in Plugins folder)
+
+## Performance Guidelines
+### Critical Performance Rules:
+- **No GameObject.Find() calls in Update/FixedUpdate/LateUpdate**
+- **Cache all component references in Start() or Awake()**
+- **Use object pooling via `Main.Pool.Spawn()` for frequently created objects**
+- **Minimize allocations in hot paths (Update, FixedUpdate, coroutines)**
+- **Use StringBuilder for string concatenation, avoid string operations in loops**
+- **Prefer arrays over Lists for fixed-size collections**
+- **Use specific checks (CompareTag) instead of string comparisons**
+- **Avoid Camera.main, cache camera references**
+- **Use LayerMasks for Physics queries instead of checking every collider**
+
+### Memory Management:
+- **Reuse variables and collections where possible**
+- **Use static variables for frequently accessed constants**
+- **Implement IDisposable for cleanup when needed**
+- **Unsubscribe from events in OnDestroy to prevent memory leaks**
+
+### Update Loop Optimizations:
+- **Use early returns to avoid unnecessary calculations**
+- **Implement distance checks before expensive operations**
+- **Use time-based intervals for non-critical updates**
+- **Consider using coroutines for operations that don't need frame-perfect timing**
+
+## Common Patterns to Follow
+1. **Scene Loading**: Use `Main.Director.LoadScene().Async().FakeDuration().Build()`
+2. **UI Management**: Extend `View` or `TransitionUI`, use `Main.UI.Open<>()`
+3. **Update Loops**: Implement `IUpdate`, register with `Main.Mono.Register()`
+4. **Object Creation**: Use factories with object pooling where possible
+5. **Player References**: Avoid `FindGameObjectWithTag`, use singleton pattern instead
+
+## Known Issues to Avoid
+- Don't use `FindGameObjectWithTag("Player")` without null checks
+- Don't create Vector3 objects every frame in Update loops
+- Ensure all managers use OSK framework patterns consistently
+- Check EnemySpawner calls correct factory methods
+
+## When Adding New Features
+- Follow existing architectural patterns
+- Use interfaces for extensibility
+- Integrate with OSK framework systems
+- Consider object pooling for performance
+- Add proper null checks and error handling
+- Register components with appropriate managers
+
+## Questions to Ask
+Feel free to ask about:
+- OSK Framework usage and best practices
+- Architectural decisions and patterns
+- Performance optimizations
+- Code refactoring suggestions
+- Integration with existing systems
+- Unity-specific implementations

@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dd813f96536d6b42b3124bdf2944e24, type: 3}
+  m_Name: ListViewSO
+  m_EditorClassIdentifier: 
+  toolip: All list of views in the project. You can add remove edit info views in
+    here.
+  _listView:
+  - path: UI/GameOverUI.prefab
+    viewType: 0
+    isPreloadSpawn: 1
+    isRemoveOnHide: 0
+    depth: 0
+    view: {fileID: -4382670027449277547, guid: 231d3d6d601e17c4bb0acbe0a37a1447, type: 3}
+  - path: UI/GameplayUI.prefab
+    viewType: 0
+    isPreloadSpawn: 1
+    isRemoveOnHide: 0
+    depth: 0
+    view: {fileID: 4647687541719102941, guid: 4e26efa84b1dd7441a59b3b10a9074ca, type: 3}
+  - path: UI/MainMenuUI.prefab
+    viewType: 0
+    isPreloadSpawn: 1
+    isRemoveOnHide: 0
+    depth: 0
+    view: {fileID: 5421005580366423110, guid: 392f73d27642ec94ab71651f42fa4b14, type: 3}
+  - path: UI/LoadingUI.prefab
+    viewType: 0
+    isPreloadSpawn: 1
+    isRemoveOnHide: 0
+    depth: 99
+    view: {fileID: 3975726774872403320, guid: af4f97365b501bb49ab7db52f6736671, type: 3}
