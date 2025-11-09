@@ -68,4 +68,8 @@ public class PlayerController : MonoBehaviour, IUpdate, IFixedUpdate
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, deltaTime * 10f);
         }
     }
+    private void OnDestroy()
+    {
+        Main.Mono.UnRegister(this);
+    }
 }

@@ -6,11 +6,11 @@ public class Fruit : GoodFood
     [SerializeField] protected EFruitType fruitType;
 
     public EFruitType FruitType => fruitType;
-    public override bool MathchType(object type)
+    public override bool MatchType(object type)
     {
         if (type is EFruitType fruitType)
         {
-            return base.MathchType(type) && fruitType == this.fruitType;
+            return base.MatchType(type) && fruitType == this.fruitType;
         }
         return false;
     }

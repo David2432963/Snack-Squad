@@ -9,7 +9,7 @@ public class GameData_Manager : MonoBehaviour
     [SerializeField, ReadOnly] private Dictionary<EPlayerType, int> playerScores = new Dictionary<EPlayerType, int>();
 
     // Main player score for backwards compatibility
-    public int CurrentScore => playerScores.ContainsKey(EPlayerType.MainPlayer) ? playerScores[EPlayerType.MainPlayer] : 0;
+    public int CurrentScore => playerScores.ContainsKey(EPlayerType.Player) ? playerScores[EPlayerType.Player] : 0;
 
     // Individual player score access
     public int GetPlayerScore(EPlayerType playerType) => playerScores.ContainsKey(playerType) ? playerScores[playerType] : 0;
@@ -46,7 +46,7 @@ public class GameData_Manager : MonoBehaviour
     private void InitializePlayerScores()
     {
         playerScores.Clear();
-        playerScores[EPlayerType.MainPlayer] = 0;
+        playerScores[EPlayerType.Player] = 0;
         playerScores[EPlayerType.Bot1] = 0;
         playerScores[EPlayerType.Bot2] = 0;
     }
@@ -54,7 +54,7 @@ public class GameData_Manager : MonoBehaviour
     // Backwards compatibility method for main player
     public void AddScore(int amount)
     {
-        AddScore(EPlayerType.MainPlayer, amount);
+        AddScore(EPlayerType.Player, amount);
     }
 
     // New method for specific player scoring
@@ -70,7 +70,7 @@ public class GameData_Manager : MonoBehaviour
         // Notify different events based on player type
         switch (playerType)
         {
-            case EPlayerType.MainPlayer:
+            case EPlayerType.Player:
                 Main.Observer.Notify(EEvent.OnScoreChange, playerScores[playerType]);
                 break;
             case EPlayerType.Bot1:

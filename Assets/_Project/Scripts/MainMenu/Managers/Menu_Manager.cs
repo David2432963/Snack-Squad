@@ -17,6 +17,7 @@ public class Menu_Manager : MonoBehaviour
             {
             }).OnComplete(() =>
             {
+                Main.UI.Get<MainMenuUI>().Hide();
             }).Build();
     }
 }

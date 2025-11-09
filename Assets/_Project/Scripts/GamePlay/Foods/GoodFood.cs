@@ -5,12 +5,11 @@ public class GoodFood : Food
 {
     [SerializeField] protected EFoodType foodType;
     [SerializeField] private int point;
-    [SerializeField] private ParticleSystem[] blowFx;
 
     public EFoodType FoodType => foodType;
     public int Point => point;
 
-    public virtual bool MathchType(object type)
+    public virtual bool MatchType(object type)
     {
         if (type is EFoodType foodType)
         {
@@ -21,12 +20,12 @@ public class GoodFood : Food
 
     protected override void OnTriggerEnter(Collider other)
     {
-        EPlayerType playerType = EPlayerType.MainPlayer; // Default to main player
+        EPlayerType playerType = EPlayerType.Player; // Default to main player
         bool isPlayer = false;
 
         if (other.CompareTag("Player"))
         {
-            playerType = EPlayerType.MainPlayer;
+            playerType = EPlayerType.Player;
             isPlayer = true;
         }
         else if (other.CompareTag("Bot"))

@@ -6,11 +6,11 @@ public class FastFood : GoodFood
     [SerializeField] protected EFastFoodType fastFoodType;
 
     public EFastFoodType FastFoodType => fastFoodType;
-    public override bool MathchType(object type)
+    public override bool MatchType(object type)
     {
         if (type is EFastFoodType fastFoodType)
         {
-            return base.MathchType(type) && fastFoodType == this.fastFoodType;
+            return base.MatchType(type) && fastFoodType == this.fastFoodType;
         }
         return false;
     }

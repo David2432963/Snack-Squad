@@ -8,6 +8,11 @@ public class Tile : MonoBehaviour
     public void AddFood(Food food)
     {
         foodOnTile = food;
+        if (food is null)
+        {
+            HPDebug.LogError("[Tile] Attempted to add null food to tile.", gameObject);
+            return;
+        }
         food.transform.position = transform.position;
         food.OnRemoved += () =>
         {

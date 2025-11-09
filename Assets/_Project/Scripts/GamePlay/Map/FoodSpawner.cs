@@ -9,6 +9,7 @@ public class FoodSpawner : MonoBehaviour
     [SerializeField] private Tile[] tiles;
     [SerializeField] private Fruit[] fruitsPrefabs;
     [SerializeField] private FastFood[] fastFoodPrefabs;
+    [SerializeField] private Cake[] cakePrefabs;
     [SerializeField] private BadFood[] badFoodPrefabs;
     [SerializeField] private int maxGoodFoodToSpawn;
     [SerializeField] private int maxBadFoodToSpawn;
@@ -18,7 +19,7 @@ public class FoodSpawner : MonoBehaviour
     private List<Tile> emptyTiles = new();
     private List<Food> foodPrefabs = new();
     private List<Food> spawnedFoods = new();
-    
+
     // Session food type tracking
     private EFoodType sessionFoodType;
     private bool foodTypeInitialized = false;
@@ -32,15 +33,16 @@ public class FoodSpawner : MonoBehaviour
     private void Awake()
     {
         SingletonManager.Instance.RegisterScene(this);
+        Main.Observer.Add(EEvent.OnGoodFoodCollected, OnRemoveFood);
+        Main.Observer.Add(EEvent.OnBadFoodCollected, OnRemoveBadFood);
     }
     private void Start()
     {
         // Randomly select food type for this session
+
         InitializeRandomFoodType();
-        
+
         StartCoroutine(nameof(IECheckSpawnFood));
-        Main.Observer.Add(EEvent.OnGoodFoodCollected, OnRemoveFood);
-        Main.Observer.Add(EEvent.OnBadFoodCollected, OnRemoveBadFood);
 
         CheckEmptyTiles();
         SpawnFood();
@@ -52,17 +54,17 @@ public class FoodSpawner : MonoBehaviour
         List<EFoodType> availableFoodTypes = new List<EFoodType>
         {
             EFoodType.Fruit,
-            EFoodType.FastFood
-            // EFoodType.Cake // Uncomment when cake system is implemented
+            EFoodType.FastFood,
+            EFoodType.Cake
         };
 
         // Randomly select one food type for this session
         sessionFoodType = availableFoodTypes[Random.Range(0, availableFoodTypes.Count)];
         foodTypeInitialized = true;
-        
+
         // Setup food prefabs for the selected type
         SetupFoodPrefabsForSession();
-        
+
         // Notify other systems about the selected food type
         Main.Observer.Notify(EEvent.OnSessionFoodTypeSelected, sessionFoodType);
     }
@@ -70,7 +72,7 @@ public class FoodSpawner : MonoBehaviour
     private void SetupFoodPrefabsForSession()
     {
         foodPrefabs.Clear();
-        
+
         switch (sessionFoodType)
         {
             case EFoodType.Fruit:
@@ -80,10 +82,11 @@ public class FoodSpawner : MonoBehaviour
                 foodPrefabs.AddRange(fastFoodPrefabs);
                 break;
             case EFoodType.Cake:
+                foodPrefabs.AddRange(cakePrefabs);
                 break;
         }
     }
-    
+
     [Button]
     private void SpawnFood()
     {
@@ -197,7 +200,7 @@ public class FoodSpawner : MonoBehaviour
     private void OnRemoveFood(object data)
     {
         Food food = null;
-        
+
         // Handle new FoodCollectionData format
         if (data is FoodCollectionData collectionData)
         {
@@ -208,7 +211,7 @@ public class FoodSpawner : MonoBehaviour
         {
             food = legacyFood;
         }
-        
+
         if (food != null)
         {
             spawnedFoods.Remove(food);

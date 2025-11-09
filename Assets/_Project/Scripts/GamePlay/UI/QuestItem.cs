@@ -5,7 +5,6 @@ using Sirenix.OdinInspector;
 public class QuestItem : MonoBehaviour
 {
     [Title("UI Components")]
-    [SerializeField] private Text questNameText;
     [SerializeField] private Text questDescriptionText;
     [SerializeField] private Text progressText;
     [SerializeField] private Text detailedProgressText; // New field for detailed multi-item progress
@@ -62,12 +61,6 @@ public class QuestItem : MonoBehaviour
 
         var quest = currentQuestProgress.Quest;
 
-        // Update quest name
-        if (questNameText != null)
-        {
-            questNameText.text = quest.QuestName;
-        }
-
         // Update quest description - always show the auto-generated description
         if (questDescriptionText != null)
         {
@@ -77,7 +70,7 @@ public class QuestItem : MonoBehaviour
         // Update progress text
         if (progressText != null)
         {
-            progressText.text = $"{currentQuestProgress.CurrentAmount}/{quest.TargetAmount} items collected";
+            progressText.text = $"{currentQuestProgress.CurrentAmount}/{quest.TargetAmount} items";
         }
 
         // Update detailed progress text
@@ -131,18 +124,6 @@ public class QuestItem : MonoBehaviour
         else if (currentQuestProgress.IsCompleted)
         {
             targetColor = completedColor;
-        }
-
-        // Apply color to quest name text
-        if (questNameText != null)
-        {
-            questNameText.color = targetColor;
-        }
-
-        // Apply color to progress text
-        if (progressText != null)
-        {
-            progressText.color = targetColor;
         }
 
         // Apply color to detailed progress text
@@ -213,8 +194,8 @@ public class QuestItem : MonoBehaviour
     /// </summary>
     public bool CanClaimReward()
     {
-        return currentQuestProgress != null && 
-               currentQuestProgress.IsCompleted && 
+        return currentQuestProgress != null &&
+               currentQuestProgress.IsCompleted &&
                !currentQuestProgress.IsRewardClaimed;
     }
 

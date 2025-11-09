@@ -7,7 +7,7 @@ public enum ESkin
 
 public enum EPlayerType
 {
-    MainPlayer = 0,
+    Player = 0,
     Bot1 = 1,
     Bot2 = 2
 }
@@ -53,5 +53,13 @@ public enum EFastFoodType
 
 public enum ECakeType
 {
-
+    Berry = 1,
+    Caramel = 2,
+    Cherry = 3,
+    Chocolate = 4,
+    Lemon = 5,
+    Lilac = 6,
+    Lime = 7,
+    Matcha = 8,
+    Plain = 9,
 }

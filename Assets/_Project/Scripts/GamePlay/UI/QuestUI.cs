@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Sirenix.OdinInspector;
+using OSK;
 
 public class QuestUI : MonoBehaviour
 {
@@ -19,22 +20,28 @@ public class QuestUI : MonoBehaviour
 
     public void Initialize()
     {
-
+        Main.Observer.Add(EEvent.OnQuestAdded, OnQuestAdded);
+        Main.Observer.Add(EEvent.OnQuestProgressUpdated, OnQuestProgressUpdated);
+        Main.Observer.Add(EEvent.OnQuestCompleted, OnQuestCompleted);
+        Main.Observer.Add(EEvent.OnQuestRewardClaimed, OnQuestRewardClaimed);
     }
-
-    private void Start()
+    private void Awake()
     {
         // Subscribe to quest events
-        if (Quest_Manager.Instance != null)
-        {
-            Quest_Manager.Instance.OnQuestAdded += OnQuestAdded;
-            Quest_Manager.Instance.OnQuestProgressUpdated += OnQuestProgressUpdated;
-            Quest_Manager.Instance.OnQuestCompleted += OnQuestCompleted;
-            Quest_Manager.Instance.OnQuestRewardClaimed += OnQuestRewardClaimed;
-        }
 
+    }
+    private void Start()
+    {
         // Initial refresh
-        RefreshQuestDisplay();
+        // RefreshQuestDisplay();
+    }
+    private void OnDestroy()
+    {
+        // Unsubscribe from quest events
+        Main.Observer.Remove(EEvent.OnQuestAdded, OnQuestAdded);
+        Main.Observer.Remove(EEvent.OnQuestProgressUpdated, OnQuestProgressUpdated);
+        Main.Observer.Remove(EEvent.OnQuestCompleted, OnQuestCompleted);
+        Main.Observer.Remove(EEvent.OnQuestRewardClaimed, OnQuestRewardClaimed);
     }
 
     private void Update()
@@ -52,25 +59,15 @@ public class QuestUI : MonoBehaviour
             {
                 RefreshQuestDisplay();
             }
-            
+
             lastRefreshTime = Time.time;
         }
     }
 
-    private void OnDestroy()
-    {
-        // Unsubscribe from quest events
-        if (Quest_Manager.Instance != null)
-        {
-            Quest_Manager.Instance.OnQuestAdded -= OnQuestAdded;
-            Quest_Manager.Instance.OnQuestProgressUpdated -= OnQuestProgressUpdated;
-            Quest_Manager.Instance.OnQuestCompleted -= OnQuestCompleted;
-            Quest_Manager.Instance.OnQuestRewardClaimed -= OnQuestRewardClaimed;
-        }
-    }
+
 
     [Button("Refresh Quest Display")]
-    public void RefreshQuestDisplay()
+    public void RefreshQuestDisplay(object data = null)
     {
         if (Quest_Manager.Instance == null || questContainer == null) return;
 
@@ -141,34 +138,46 @@ public class QuestUI : MonoBehaviour
 
     #region Event Handlers
 
-    private void OnQuestAdded(QuestProgress questProgress)
+    private void OnQuestAdded(object data)
     {
-        Debug.Log($"[QuestUI] Quest added: {questProgress.Quest.QuestName}");
-        RefreshQuestDisplay();
-    }
-
-    private void OnQuestProgressUpdated(QuestProgress questProgress)
-    {
-        // Update individual quest items instead of refreshing everything
-        // This is more efficient than full refresh
-        if (!autoRefresh)
+        if (data is QuestProgress questProgress)
         {
-            // Only refresh if auto-refresh is disabled
-            // If auto-refresh is enabled, let the Update loop handle it
+            Debug.Log($"[QuestUI] Quest added: {questProgress.Quest.QuestName}");
             RefreshQuestDisplay();
         }
     }
 
-    private void OnQuestCompleted(QuestProgress questProgress)
+    private void OnQuestProgressUpdated(object data)
     {
-        Debug.Log($"[QuestUI] Quest completed: {questProgress.Quest.QuestName}");
-        RefreshQuestDisplay();
+        if (data is QuestProgress questProgress)
+        {
+            // Update individual quest items instead of refreshing everything
+            // This is more efficient than full refresh
+            if (!autoRefresh)
+            {
+                // Only refresh if auto-refresh is disabled
+                // If auto-refresh is enabled, let the Update loop handle it
+                RefreshQuestDisplay();
+            }
+        }
     }
 
-    private void OnQuestRewardClaimed(QuestProgress questProgress)
+    private void OnQuestCompleted(object data)
     {
-        Debug.Log($"[QuestUI] Quest reward claimed: {questProgress.Quest.QuestName}");
-        RefreshQuestDisplay();
+        if (data is QuestProgress questProgress)
+        {
+            Debug.Log($"[QuestUI] Quest completed: {questProgress.Quest.QuestName}");
+            RefreshQuestDisplay();
+        }
+    }
+
+    private void OnQuestRewardClaimed(object data)
+    {
+        if (data is QuestProgress questProgress)
+        {
+            Debug.Log($"[QuestUI] Quest reward claimed: {questProgress.Quest.QuestName}");
+            RefreshQuestDisplay();
+        }
     }
 
     #endregion

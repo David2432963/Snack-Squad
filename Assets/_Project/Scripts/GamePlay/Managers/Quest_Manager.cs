@@ -8,24 +8,18 @@ using System;
 public class Quest_Manager : MonoBehaviour
 {
     [Title("Quest Configuration")]
-    [SerializeField] private FoodCollectionQuest[] questDatas;
+    [SerializeField] private FoodCollectionQuestSO[] questDatas;
     [SerializeField] private int maxActiveQuests = 3;
     [SerializeField] private bool autoAssignQuests = true;
 
     [Title("Session Configuration")]
     [SerializeField, ReadOnly] private EFoodType sessionFoodType;
-    [SerializeField, ReadOnly] private FoodCollectionQuest[] sessionQuests;
+    [SerializeField, ReadOnly] private FoodCollectionQuestSO[] sessionQuests;
     [SerializeField, ReadOnly] private bool sessionInitialized = false;
 
     [Title("Debug Info")]
     [SerializeField, ReadOnly] private List<QuestProgress> activeQuests = new List<QuestProgress>();
     [SerializeField, ReadOnly] private List<QuestProgress> completedQuests = new List<QuestProgress>();
-
-    // Events
-    public event Action<QuestProgress> OnQuestAdded;
-    public event Action<QuestProgress> OnQuestProgressUpdated;
-    public event Action<QuestProgress> OnQuestCompleted;
-    public event Action<QuestProgress> OnQuestRewardClaimed;
 
     // Properties
     public static Quest_Manager Instance => SingletonManager.Instance.Get<Quest_Manager>();
@@ -38,25 +32,21 @@ public class Quest_Manager : MonoBehaviour
     private void Awake()
     {
         SingletonManager.Instance.RegisterScene(this);
-    }
-
-    private void Start()
-    {
-        // Subscribe to food collection events
         Main.Observer.Add(EEvent.OnGoodFoodCollected, OnGoodFoodCollected);
-        // Auto-load quests if array is empty
+        Main.Observer.Add(EEvent.OnSessionFoodTypeSelected, OnSessionFoodTypeSelected);
+
         if (questDatas == null || questDatas.Length == 0)
         {
             LoadQuestsFromAssets();
         }
-        SelectRandomSessionFoodType();
     }
 
-    private void SelectRandomSessionFoodType()
+    private void OnSessionFoodTypeSelected(object data)
     {
-        var foodTypes = Enum.GetValues(typeof(EFoodType));
-        var data = (EFoodType)foodTypes.GetValue(UnityEngine.Random.Range(0, foodTypes.Length));
-        InitializeWithSessionFoodType(data);
+        if (data is EFoodType foodType)
+        {
+            InitializeWithSessionFoodType(foodType);
+        }
     }
 
     private void InitializeWithSessionFoodType(EFoodType foodType)
@@ -76,11 +66,11 @@ public class Quest_Manager : MonoBehaviour
     {
         if (questDatas == null || questDatas.Length == 0)
         {
-            sessionQuests = new FoodCollectionQuest[0];
+            sessionQuests = new FoodCollectionQuestSO[0];
             return;
         }
 
-        var filteredQuests = new List<FoodCollectionQuest>();
+        var filteredQuests = new List<FoodCollectionQuestSO>();
         foreach (var quest in questDatas)
         {
             if (quest.RequiredFoodType == sessionFoodType)
@@ -116,13 +106,13 @@ public class Quest_Manager : MonoBehaviour
     {
 #if UNITY_EDITOR
         string searchPath = "Assets/_Project/Datas/NormalQuestData";
-        string[] guids = UnityEditor.AssetDatabase.FindAssets("t:FoodCollectionQuest", new[] { searchPath });
-        List<FoodCollectionQuest> foundQuests = new List<FoodCollectionQuest>();
+        string[] guids = UnityEditor.AssetDatabase.FindAssets("t:FoodCollectionQuestSO", new[] { searchPath });
+        List<FoodCollectionQuestSO> foundQuests = new List<FoodCollectionQuestSO>();
 
         foreach (string guid in guids)
         {
             string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
-            FoodCollectionQuest quest = UnityEditor.AssetDatabase.LoadAssetAtPath<FoodCollectionQuest>(path);
+            FoodCollectionQuestSO quest = UnityEditor.AssetDatabase.LoadAssetAtPath<FoodCollectionQuestSO>(path);
             if (quest != null)
             {
                 foundQuests.Add(quest);
@@ -164,7 +154,7 @@ public class Quest_Manager : MonoBehaviour
         }
     }
 
-    private bool AddQuest(FoodCollectionQuest quest)
+    private bool AddQuest(FoodCollectionQuestSO quest)
     {
         if (quest == null)
         {
@@ -190,12 +180,12 @@ public class Quest_Manager : MonoBehaviour
         SubscribeToQuestEvents(questProgress);
         activeQuests.Add(questProgress);
 
-        OnQuestAdded?.Invoke(questProgress);
+        Main.Observer.Notify(EEvent.OnQuestAdded, questProgress);
 
         return true;
     }
 
-    private bool RemoveQuest(FoodCollectionQuest quest)
+    private bool RemoveQuest(FoodCollectionQuestSO quest)
     {
         var questProgress = GetActiveQuestProgress(quest);
         if (questProgress == null)
@@ -217,7 +207,7 @@ public class Quest_Manager : MonoBehaviour
         activeQuests.Remove(questProgress);
         completedQuests.Add(questProgress);
 
-        OnQuestCompleted?.Invoke(questProgress);
+        Main.Observer.Notify(EEvent.OnQuestCompleted, questProgress);
 
         // Notify daily quest system about completed normal quest
         if (DailyQuest_Manager.Instance != null)
@@ -233,7 +223,7 @@ public class Quest_Manager : MonoBehaviour
         }
     }
 
-    private void ClaimQuestReward(FoodCollectionQuest quest)
+    private void ClaimQuestReward(FoodCollectionQuestSO quest)
     {
         var questProgress = GetCompletedQuestProgress(quest);
         if (questProgress != null)
@@ -250,7 +240,7 @@ public class Quest_Manager : MonoBehaviour
     {
         if (data is FoodCollectionData collectionData)
         {
-            if (collectionData.playerType == EPlayerType.MainPlayer)
+            if (collectionData.playerType == EPlayerType.Player)
             {
                 ProcessFoodCollection(collectionData.food);
             }
@@ -296,6 +286,10 @@ public class Quest_Manager : MonoBehaviour
                 }
                 break;
             case EFoodType.Cake:
+                if (food is Cake cakeFood)
+                {
+                    return (int)cakeFood.CakeType;
+                }
                 break;
         }
         return -1;
@@ -317,7 +311,7 @@ public class Quest_Manager : MonoBehaviour
 
     private void HandleQuestProgressUpdated(QuestProgress questProgress)
     {
-        OnQuestProgressUpdated?.Invoke(questProgress);
+        Main.Observer.Notify(EEvent.OnQuestProgressUpdated, questProgress);
     }
 
     private void HandleQuestCompleted(QuestProgress questProgress)
@@ -327,29 +321,29 @@ public class Quest_Manager : MonoBehaviour
 
     private void HandleQuestRewardClaimed(QuestProgress questProgress)
     {
-        OnQuestRewardClaimed?.Invoke(questProgress);
+        Main.Observer.Notify(EEvent.OnQuestRewardClaimed, questProgress);
     }
 
     #endregion
 
     #region Query Methods
 
-    public QuestProgress GetActiveQuestProgress(FoodCollectionQuest quest)
+    public QuestProgress GetActiveQuestProgress(FoodCollectionQuestSO quest)
     {
         return activeQuests.FirstOrDefault(q => q.Quest == quest);
     }
 
-    public QuestProgress GetCompletedQuestProgress(FoodCollectionQuest quest)
+    public QuestProgress GetCompletedQuestProgress(FoodCollectionQuestSO quest)
     {
         return completedQuests.FirstOrDefault(q => q.Quest == quest);
     }
 
-    public bool IsQuestActive(FoodCollectionQuest quest)
+    public bool IsQuestActive(FoodCollectionQuestSO quest)
     {
         return activeQuests.Any(q => q.Quest == quest);
     }
 
-    public bool IsQuestCompleted(FoodCollectionQuest quest)
+    public bool IsQuestCompleted(FoodCollectionQuestSO quest)
     {
         return completedQuests.Any(q => q.Quest == quest);
     }

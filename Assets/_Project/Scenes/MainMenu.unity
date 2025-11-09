@@ -122,6 +122,65 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &308824997
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 308824998}
+  - component: {fileID: 308824999}
+  m_Layer: 0
+  m_Name: DailyQuest_Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &308824998
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 308824997}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1088565753}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &308824999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 308824997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: add2cb078a11f0347bec3e12a5d77bdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  availableDailyQuests:
+  - {fileID: 11400000, guid: f0cdb5aaf659369488d402e924dac5da, type: 2}
+  - {fileID: 11400000, guid: cc6de2ffd6d138947b533736f9b1300d, type: 2}
+  - {fileID: 11400000, guid: 7b77a5290352e5d44b4295c431460b85, type: 2}
+  - {fileID: 11400000, guid: 18f4b8a0b89175e48962ba337d9a136b, type: 2}
+  - {fileID: 11400000, guid: 7a8f5ce971ddd914bb22196c554e5ea1, type: 2}
+  - {fileID: 11400000, guid: 975b408315ca26d45bf59b552e5f6a5d, type: 2}
+  - {fileID: 11400000, guid: 43c7ea7084afe614bba8c70258472479, type: 2}
+  - {fileID: 11400000, guid: 7bd18d1ba64608d4c9f3e9b606aa8fb7, type: 2}
+  - {fileID: 11400000, guid: 8877df152b995b045a99b9637f99cba4, type: 2}
+  - {fileID: 11400000, guid: c6a482659e787064990244dd2c04df68, type: 2}
+  maxDailyQuests: 2
+  autoAssignDailyQuests: 1
+  activeDailyQuests: []
+  completedDailyQuests: []
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -339,6 +398,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1320402825}
+  - {fileID: 308824998}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1088565754
@@ -364,7 +424,7 @@ GameObject:
   - component: {fileID: 1320402825}
   - component: {fileID: 1320402826}
   m_Layer: 0
-  m_Name: UIMenuManager
+  m_Name: UIMenu_Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
