@@ -3021,15 +3021,8 @@ MonoBehaviour:
   - {fileID: 361353774}
   - {fileID: 1067939656}
   - {fileID: 2067294721}
-  corners:
-  - {fileID: 2051592476}
-  - {fileID: 1393678888}
-  - {fileID: 219333543}
-  - {fileID: 1546296217}
   playerType: 1
   moveSpeed: 3
-  detectionRadius: 10
-  randomMoveInterval: 3.5
 --- !u!114 &45733430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109185,15 +109178,8 @@ MonoBehaviour:
   - {fileID: 2114198990}
   - {fileID: 1336557820}
   - {fileID: 1743015340}
-  corners:
-  - {fileID: 2051592476}
-  - {fileID: 1393678888}
-  - {fileID: 219333543}
-  - {fileID: 1546296217}
   playerType: 2
   moveSpeed: 3
-  detectionRadius: 10
-  randomMoveInterval: 3.5
 --- !u!143 &1602256807
 CharacterController:
   m_ObjectHideFlags: 0

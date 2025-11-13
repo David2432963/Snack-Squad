@@ -56,8 +56,8 @@ public class GameOverUI : View
         var playerData = new List<(string name, int score, EPlayerType type)>
         {
             ("Player", playerScore, EPlayerType.Player),
-            ("Bot 1", bot1Score, EPlayerType.Edward),
-            ("Bot 2", bot2Score, EPlayerType.Bruce)
+            ("Edward", bot1Score, EPlayerType.Edward),
+            ("Bruce", bot2Score, EPlayerType.Bruce)
         };
 
         // Sort by score (descending)
