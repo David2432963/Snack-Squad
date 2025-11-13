@@ -4,10 +4,8 @@ using UnityEngine;
 public class GoodFood : Food
 {
     [SerializeField] protected EFoodType foodType;
-    [SerializeField] private int point;
 
     public EFoodType FoodType => foodType;
-    public int Point => point;
 
     public virtual bool MatchType(object type)
     {
@@ -25,6 +23,7 @@ public class GoodFood : Food
 
         if (other.CompareTag("Player"))
         {
+            Main.Sound.Play(SoundID.CollectItem.ToString());
             playerType = EPlayerType.Player;
             isPlayer = true;
         }
@@ -39,15 +38,29 @@ public class GoodFood : Food
             }
         }
 
+        var collectionData = new FoodCollectionData(this, playerType);
         if (isPlayer)
         {
-            GameData_Manager.Instance.AddScore(playerType, point);
-            
+            SaveFoodCollectionToGameData();
+
             // Pass both food and player type information for quest system
-            var collectionData = new FoodCollectionData(this, playerType);
-            Main.Observer.Notify(EEvent.OnGoodFoodCollected, collectionData);
+            Main.Observer.Notify(EEvent.OnPlayerCollectFood, collectionData);
         }
-        
+        Main.Observer.Notify(EEvent.OnGoodFoodCollected, collectionData);
+
         base.OnTriggerEnter(other);
+    }
+
+    protected virtual void SaveFoodCollectionToGameData()
+    {
+        object specificType = GetSpecificFoodType();
+        GameData.AddFoodCollected(foodType, specificType);
+    }
+
+    protected virtual object GetSpecificFoodType()
+    {
+        // Base implementation returns null
+        // Override in derived classes (Fruit, FastFood, Cake) to return specific types
+        return null;
     }
 }

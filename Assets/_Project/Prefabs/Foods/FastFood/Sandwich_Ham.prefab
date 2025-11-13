@@ -46,6 +46,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1cd1ece5c11edc4ca1bcf467ee10997, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  floatHeight: 0.1
+  floatDuration: 1
   foodType: 2
   point: 10
   fastFoodType: 8
@@ -68,7 +70,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.5, y: 1, z: 0.5}
+  m_Size: {x: 0.7, y: 1, z: 0.7}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &4325549594474996621
 PrefabInstance:
@@ -142,10 +144,36 @@ PrefabInstance:
     - {fileID: 186827647507767284, guid: c576dc5374cb15248ab1a4effcf395ba, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2480432581437078472, guid: c576dc5374cb15248ab1a4effcf395ba, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 985754357346974554}
   m_SourcePrefab: {fileID: 100100000, guid: c576dc5374cb15248ab1a4effcf395ba, type: 3}
 --- !u!4 &1522468010678846207 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2965502599025713522, guid: c576dc5374cb15248ab1a4effcf395ba, type: 3}
   m_PrefabInstance: {fileID: 4325549594474996621}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2191903068513687621 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2480432581437078472, guid: c576dc5374cb15248ab1a4effcf395ba, type: 3}
+  m_PrefabInstance: {fileID: 4325549594474996621}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &985754357346974554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2191903068513687621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 1
+  outlineColor: {r: 0.2509804, g: 1, b: 0.2509804, a: 1}
+  outlineWidth: 1
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []

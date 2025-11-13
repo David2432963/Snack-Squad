@@ -27,8 +27,12 @@ public class DailyQuest_Manager : MonoBehaviour
 
     private void Awake()
     {
-        SingletonManager.Instance.RegisterGlobal(this);
-        Main.Observer.Add(EEvent.OnGoodFoodCollected, OnGoodFoodCollected);
+        SingletonManager.Instance.RegisterScene(this);
+        Main.Observer.Add(EEvent.OnPlayerCollectFood, OnGoodFoodCollected);
+        Main.Observer.Add(EEvent.OnQuestCompleted, OnNormalQuestCompleted);
+        
+        // Initialize daily progress tracking
+        GameData.CheckAndResetDailyProgress();
     }
 
     private void Start()
@@ -54,7 +58,8 @@ public class DailyQuest_Manager : MonoBehaviour
         SaveDailyQuestData();
 
         // Unsubscribe from events
-        Main.Observer.Remove(EEvent.OnGoodFoodCollected, OnGoodFoodCollected);
+        Main.Observer.Remove(EEvent.OnPlayerCollectFood, OnGoodFoodCollected);
+        Main.Observer.Remove(EEvent.OnQuestCompleted, OnNormalQuestCompleted);
 
         // Unsubscribe from daily quest events
         foreach (var quest in activeDailyQuests)
@@ -94,74 +99,75 @@ public class DailyQuest_Manager : MonoBehaviour
 
     private void CheckAndAssignDailyQuests()
     {
-        // Check if it's a new day
-        DateTime today = DateTime.Now.Date;
-
-        if (lastLoginDate.Date != today)
+        // Check if we have valid save data from today
+        bool hasTodaysData = DailyQuestSaveSystem.HasTodaysSaveData();
+        
+        if (!hasTodaysData)
         {
-            // New day detected
-            HandleNewDay();
+            // No today's data - generate new daily quests
+            ClearAllQuests();
+            if (autoAssignDailyQuests)
+            {
+                AssignRandomDailyQuests();
+            }
+        }
+        else if (activeDailyQuests.Count == 0)
+        {
+            // We have today's data but no active quests loaded - this shouldn't happen
+            // But if it does, generate new quests
+            if (autoAssignDailyQuests)
+            {
+                AssignRandomDailyQuests();
+            }
         }
 
-        // Assign daily quests if needed
-        if (autoAssignDailyQuests && activeDailyQuests.Count == 0)
-        {
-            AssignRandomDailyQuests();
-        }
-
-        // Remove expired quests
-        RemoveExpiredQuests();
+        // Update last login date
+        lastLoginDate = DateTime.Now.Date;
     }
 
-    private void HandleNewDay()
+    private void ClearAllQuests()
     {
-        DateTime today = DateTime.Now.Date;
-
-        lastLoginDate = today;
-
-        // Clear completed quests from yesterday
-        ClearExpiredCompletedQuests();
-
-        // Assign new daily quests
-        if (autoAssignDailyQuests)
+        // Clear active quests
+        foreach (var quest in activeDailyQuests.ToList())
         {
-            AssignRandomDailyQuests();
+            UnsubscribeFromDailyQuestEvents(quest);
         }
+        activeDailyQuests.Clear();
+
+        // Clear completed quests
+        foreach (var quest in completedDailyQuests.ToList())
+        {
+            UnsubscribeFromDailyQuestEvents(quest);
+        }
+        completedDailyQuests.Clear();
+    }
+
+    private void CompleteDailyQuest(DailyQuestProgress questProgress)
+    {
+        if (!activeDailyQuests.Contains(questProgress)) return;
+
+        UnsubscribeFromDailyQuestEvents(questProgress);
+        activeDailyQuests.Remove(questProgress);
+        completedDailyQuests.Add(questProgress);
+
+        Main.Observer.Notify(EEvent.OnDailyQuestCompleted, questProgress);
     }
 
     private void AssignRandomDailyQuests()
     {
-        // Clear any existing active quests
-        foreach (var quest in activeDailyQuests.ToList())
-        {
-            RemoveDailyQuest(quest.Quest);
-        }
+        // Clear any existing active quests - use ClearAllQuests to properly clean up
+        ClearAllQuests();
 
         // Create the 2 types of daily quests
         CreateCompleteQuestsDaily();
+        
         CreateCollectSpecificFoodDaily();
     }
 
     private void CreateCompleteQuestsDaily()
     {
-        // Create a "Complete 2 quests" daily quest
-        var completeQuestsDaily = ScriptableObject.CreateInstance<DailyQuestSO>();
-        completeQuestsDaily.name = "Complete Normal Quests Daily";
-
-        // Use reflection to set private fields
-        var questNameField = typeof(DailyQuestSO).GetField("questName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var questDescField = typeof(DailyQuestSO).GetField("questDescription", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var questTypeField = typeof(DailyQuestSO).GetField("questType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var targetValueField = typeof(DailyQuestSO).GetField("targetValue", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var goldRewardField = typeof(DailyQuestSO).GetField("goldReward", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        questNameField?.SetValue(completeQuestsDaily, "Quest Completionist");
-        questDescField?.SetValue(completeQuestsDaily, "Complete 2 normal quests (collect 3 required foods each)");
-        questTypeField?.SetValue(completeQuestsDaily, EDailyQuestType.CompleteNormalQuests);
-        targetValueField?.SetValue(completeQuestsDaily, 2);
-        goldRewardField?.SetValue(completeQuestsDaily, 100);
-
-        AddDailyQuest(completeQuestsDaily);
+        var quest = CreateCompleteQuestsQuestSO();
+        AddDailyQuest(quest);
     }
 
     private void CreateCollectSpecificFoodDaily()
@@ -174,20 +180,6 @@ public class DailyQuest_Manager : MonoBehaviour
         var foodTypes = System.Enum.GetValues(typeof(EFoodType));
         EFoodType randomFoodType = (EFoodType)foodTypes.GetValue(UnityEngine.Random.Range(0, foodTypes.Length));
 
-        // Use reflection to set private fields
-        var questNameField = typeof(DailyQuestSO).GetField("questName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var questDescField = typeof(DailyQuestSO).GetField("questDescription", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var questTypeField = typeof(DailyQuestSO).GetField("questType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var targetValueField = typeof(DailyQuestSO).GetField("targetValue", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var foodTypeField = typeof(DailyQuestSO).GetField("requiredFoodType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var goldRewardField = typeof(DailyQuestSO).GetField("goldReward", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        // Set common fields
-        questTypeField?.SetValue(collectFoodDaily, EDailyQuestType.CollectSpecificFood);
-        targetValueField?.SetValue(collectFoodDaily, 10);
-        foodTypeField?.SetValue(collectFoodDaily, randomFoodType);
-        goldRewardField?.SetValue(collectFoodDaily, 50);
-
         string foodName = "";
 
         // Set specific food type based on category
@@ -196,28 +188,22 @@ public class DailyQuest_Manager : MonoBehaviour
             case EFoodType.Fruit:
                 var fruitTypes = System.Enum.GetValues(typeof(EFruitType));
                 EFruitType randomFruit = (EFruitType)fruitTypes.GetValue(UnityEngine.Random.Range(0, fruitTypes.Length));
-                var fruitField = typeof(DailyQuestSO).GetField("requiredFruitType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                fruitField?.SetValue(collectFoodDaily, randomFruit);
                 foodName = randomFruit.ToString();
+                SetCollectFoodQuestFields(collectFoodDaily, foodName, randomFoodType, randomFruit, default, default);
                 break;
             case EFoodType.FastFood:
                 var fastFoodTypes = System.Enum.GetValues(typeof(EFastFoodType));
                 EFastFoodType randomFastFood = (EFastFoodType)fastFoodTypes.GetValue(UnityEngine.Random.Range(0, fastFoodTypes.Length));
-                var fastFoodField = typeof(DailyQuestSO).GetField("requiredFastFoodType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                fastFoodField?.SetValue(collectFoodDaily, randomFastFood);
                 foodName = randomFastFood.ToString();
+                SetCollectFoodQuestFields(collectFoodDaily, foodName, randomFoodType, default, randomFastFood, default);
                 break;
             case EFoodType.Cake:
                 var cakeTypes = System.Enum.GetValues(typeof(ECakeType));
                 ECakeType randomCake = (ECakeType)cakeTypes.GetValue(UnityEngine.Random.Range(0, cakeTypes.Length));
-                var cakeField = typeof(DailyQuestSO).GetField("requiredCakeType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                cakeField?.SetValue(collectFoodDaily, randomCake);
                 foodName = randomCake.ToString();
+                SetCollectFoodQuestFields(collectFoodDaily, foodName, randomFoodType, default, default, randomCake);
                 break;
         }
-
-        questNameField?.SetValue(collectFoodDaily, $"{foodName} Collector");
-        questDescField?.SetValue(collectFoodDaily, $"Collect 10 {foodName} items");
 
         AddDailyQuest(collectFoodDaily);
     }
@@ -225,19 +211,28 @@ public class DailyQuest_Manager : MonoBehaviour
     private bool AddDailyQuest(DailyQuestSO quest)
     {
         if (quest == null)
+        {
             return false;
+        }
 
         if (activeDailyQuests.Count >= maxDailyQuests)
+        {
             return false;
+        }
 
         if (IsDailyQuestActive(quest))
+        {
             return false;
+        }
 
         var questProgress = new DailyQuestProgress(quest);
         SubscribeToDailyQuestEvents(questProgress);
         activeDailyQuests.Add(questProgress);
 
         Main.Observer.Notify(EEvent.OnDailyQuestAdded, questProgress);
+        
+        // Auto-save when quest is added
+        SaveDailyQuestData();
 
         return true;
     }
@@ -252,17 +247,6 @@ public class DailyQuest_Manager : MonoBehaviour
         activeDailyQuests.Remove(questProgress);
 
         return true;
-    }
-
-    private void CompleteDailyQuest(DailyQuestProgress questProgress)
-    {
-        if (!activeDailyQuests.Contains(questProgress)) return;
-
-        UnsubscribeFromDailyQuestEvents(questProgress);
-        activeDailyQuests.Remove(questProgress);
-        completedDailyQuests.Add(questProgress);
-
-        Main.Observer.Notify(EEvent.OnDailyQuestCompleted, questProgress);
     }
 
     private void RemoveExpiredQuests()
@@ -298,49 +282,29 @@ public class DailyQuest_Manager : MonoBehaviour
         }
     }
 
-    private void ProcessSpecificFoodCollection(GoodFood food)
+    private void OnNormalQuestCompleted(object data)
     {
+        // This gets called when a normal quest (not daily quest) is completed
+        // Refresh daily quest progress for "Complete Normal Quests" type from GameData
         foreach (var questProgress in activeDailyQuests.ToList())
         {
-            if (questProgress.Quest.QuestType == EDailyQuestType.CollectSpecificFood)
+            if (questProgress.Quest.QuestType == EDailyQuestType.CompleteNormalQuests)
             {
-                if (DoesMatchRequiredFood(questProgress.Quest, food))
-                {
-                    questProgress.AddProgress(1);
-                }
+                questProgress.RefreshProgressFromGameData();
             }
         }
     }
 
-    private bool DoesMatchRequiredFood(DailyQuestSO quest, GoodFood food)
+    private void ProcessSpecificFoodCollection(GoodFood food)
     {
-        // First check if the food type matches
-        if (quest.RequiredFoodType != food.FoodType)
-            return false;
-
-        // Then check the specific type within that category
-        switch (quest.RequiredFoodType)
+        // Refresh progress from GameData for all CollectSpecificFood quests
+        foreach (var questProgress in activeDailyQuests.ToList())
         {
-            case EFoodType.Fruit:
-                if (food is Fruit fruitFood)
-                {
-                    return quest.RequiredFruitType == fruitFood.FruitType;
-                }
-                break;
-            case EFoodType.FastFood:
-                if (food is FastFood fastFood)
-                {
-                    return quest.RequiredFastFoodType == fastFood.FastFoodType;
-                }
-                break;
-            case EFoodType.Cake:
-                if (food is Cake cakeFood)
-                {
-                    return quest.RequiredCakeType == cakeFood.CakeType;
-                }
-                break;
+            if (questProgress.Quest.QuestType == EDailyQuestType.CollectSpecificFood)
+            {
+                questProgress.RefreshProgressFromGameData();
+            }
         }
-        return false;
     }
 
     private void SubscribeToDailyQuestEvents(DailyQuestProgress questProgress)
@@ -360,16 +324,25 @@ public class DailyQuest_Manager : MonoBehaviour
     private void HandleDailyQuestProgressUpdated(DailyQuestProgress questProgress)
     {
         Main.Observer.Notify(EEvent.OnDailyQuestProgressUpdated, questProgress);
+        
+        // Auto-save when quest progress changes
+        SaveDailyQuestData();
     }
 
     private void HandleDailyQuestCompleted(DailyQuestProgress questProgress)
     {
         CompleteDailyQuest(questProgress);
+        
+        // Auto-save when quest is completed
+        SaveDailyQuestData();
     }
 
     private void HandleDailyQuestRewardClaimed(DailyQuestProgress questProgress)
     {
         Main.Observer.Notify(EEvent.OnDailyQuestRewardClaimed, questProgress);
+        
+        // Auto-save when reward is claimed
+        SaveDailyQuestData();
     }
 
     #endregion
@@ -390,22 +363,30 @@ public class DailyQuest_Manager : MonoBehaviour
             lastLoginDate = DateTime.Now.Date;
         }
 
-        // Load active quests
-        LoadActiveDailyQuests(saveData.activeQuests);
+        // Load today's quests only if data is from today
+        if (saveData.IsFromToday())
+        {
+            LoadTodaysQuests(saveData.todaysQuests);
+        }
     }
 
-    private void LoadActiveDailyQuests(List<DailyQuestSaveEntry> questEntries)
+    private void LoadTodaysQuests(List<DailyQuestSaveEntry> questEntries)
     {
-        if (availableDailyQuests == null || availableDailyQuests.Length == 0)
-            return;
-
         foreach (var entry in questEntries)
         {
-            var quest = availableDailyQuests.FirstOrDefault(q => q.QuestName == entry.questName);
+            // Only process quests from today
+            if (!entry.IsFromToday())
+            {
+                continue;
+            }
+            
+            // Recreate the quest from save data
+            var quest = RecreateQuestFromSaveEntry(entry);
+            
             if (quest != null)
             {
                 var questProgress = new DailyQuestProgress(quest, entry.currentProgress,
-                    entry.isCompleted, entry.isRewardClaimed, entry.GetAssignedDate());
+                    entry.isCompleted, entry.isRewardClaimed, entry.GetQuestDate());
 
                 SubscribeToDailyQuestEvents(questProgress);
 
@@ -413,11 +394,158 @@ public class DailyQuest_Manager : MonoBehaviour
                 {
                     completedDailyQuests.Add(questProgress);
                 }
-                else if (!questProgress.IsExpired)
+                else
                 {
                     activeDailyQuests.Add(questProgress);
                 }
             }
+        }
+    }
+
+    private DailyQuestSO RecreateQuestFromSaveEntry(DailyQuestSaveEntry entry)
+    {
+        if (entry.questType == EDailyQuestType.CompleteNormalQuests)
+        {
+            return CreateCompleteQuestsQuestSO();
+        }
+        else if (entry.questType == EDailyQuestType.CollectSpecificFood)
+        {
+            return CreateCollectFoodQuestSO(entry.requiredFoodType, entry.requiredFruitType, 
+                entry.requiredFastFoodType, entry.requiredCakeType, entry.targetValue, entry.goldReward);
+        }
+        
+        return null;
+    }
+
+    private DailyQuestSO CreateCollectFoodQuestSO(EFoodType foodType, EFruitType fruitType, 
+        EFastFoodType fastFoodType, ECakeType cakeType, int targetValue, int goldReward)
+    {
+        var collectFoodQuest = ScriptableObject.CreateInstance<DailyQuestSO>();
+        collectFoodQuest.name = "Collect Specific Food Daily";
+
+        string foodName = "";
+        switch (foodType)
+        {
+            case EFoodType.Fruit:
+                foodName = fruitType.ToString();
+                SetCollectFoodQuestFields(collectFoodQuest, foodName, foodType, fruitType, default, default);
+                break;
+            case EFoodType.FastFood:
+                foodName = fastFoodType.ToString();
+                SetCollectFoodQuestFields(collectFoodQuest, foodName, foodType, default, fastFoodType, default);
+                break;
+            case EFoodType.Cake:
+                foodName = cakeType.ToString();
+                SetCollectFoodQuestFields(collectFoodQuest, foodName, foodType, default, default, cakeType);
+                break;
+        }
+
+        // Override target value and gold reward with saved values
+        var targetValueField = typeof(DailyQuestSO).GetField("targetValue", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var goldRewardField = typeof(DailyQuestSO).GetField("goldReward", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        targetValueField?.SetValue(collectFoodQuest, targetValue);
+        goldRewardField?.SetValue(collectFoodQuest, goldReward);
+
+        return collectFoodQuest;
+    }
+
+    private DailyQuestSO RecreateQuestFromSaveData(DailyQuestSaveEntry entry)
+    {
+        // Recreate dynamic quests based on their names/types
+        if (entry.questName.Contains("Quest Completionist") || entry.questName.Contains("Complete Normal Quests"))
+        {
+            return CreateCompleteQuestsQuestSO();
+        }
+        else if (entry.questName.Contains("Collector"))
+        {
+            // Try to extract the food type from the quest name
+            string foodName = entry.questName.Replace(" Collector", "");
+            return CreateCollectSpecificFoodQuestSO(foodName);
+        }
+        
+        return null;
+    }
+
+    private DailyQuestSO CreateCompleteQuestsQuestSO()
+    {
+        var completeQuestsDaily = ScriptableObject.CreateInstance<DailyQuestSO>();
+        completeQuestsDaily.name = "Complete Normal Quests Daily";
+
+        // Use reflection to set private fields
+        SetQuestFields(completeQuestsDaily, "Quest Completionist", 
+            "Complete 2 normal quests (collect 3 required foods each)", 
+            EDailyQuestType.CompleteNormalQuests, 2, 100);
+
+        return completeQuestsDaily;
+    }
+
+    private DailyQuestSO CreateCollectSpecificFoodQuestSO(string foodName)
+    {
+        var collectFoodDaily = ScriptableObject.CreateInstance<DailyQuestSO>();
+        collectFoodDaily.name = "Collect Specific Food Daily";
+
+        // Try to determine food type from name
+        EFoodType foodType;
+        if (System.Enum.TryParse(foodName, out EFruitType fruitType))
+        {
+            foodType = EFoodType.Fruit;
+            SetCollectFoodQuestFields(collectFoodDaily, foodName, foodType, fruitType, default, default);
+        }
+        else if (System.Enum.TryParse(foodName, out EFastFoodType fastFoodType))
+        {
+            foodType = EFoodType.FastFood;
+            SetCollectFoodQuestFields(collectFoodDaily, foodName, foodType, default, fastFoodType, default);
+        }
+        else if (System.Enum.TryParse(foodName, out ECakeType cakeType))
+        {
+            foodType = EFoodType.Cake;
+            SetCollectFoodQuestFields(collectFoodDaily, foodName, foodType, default, default, cakeType);
+        }
+        else
+        {
+            // Default to random if can't parse
+            return null;
+        }
+
+        return collectFoodDaily;
+    }
+
+    private void SetQuestFields(DailyQuestSO quest, string name, string description, EDailyQuestType questType, int targetValue, int goldReward)
+    {
+        var questNameField = typeof(DailyQuestSO).GetField("questName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var questDescField = typeof(DailyQuestSO).GetField("questDescription", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var questTypeField = typeof(DailyQuestSO).GetField("questType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var targetValueField = typeof(DailyQuestSO).GetField("targetValue", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var goldRewardField = typeof(DailyQuestSO).GetField("goldReward", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        questNameField?.SetValue(quest, name);
+        questDescField?.SetValue(quest, description);
+        questTypeField?.SetValue(quest, questType);
+        targetValueField?.SetValue(quest, targetValue);
+        goldRewardField?.SetValue(quest, goldReward);
+    }
+
+    private void SetCollectFoodQuestFields(DailyQuestSO quest, string foodName, EFoodType foodType, EFruitType fruitType, EFastFoodType fastFoodType, ECakeType cakeType)
+    {
+        SetQuestFields(quest, $"{foodName} Collector", $"Collect 10 {foodName} items", EDailyQuestType.CollectSpecificFood, 10, 50);
+        
+        var foodTypeField = typeof(DailyQuestSO).GetField("requiredFoodType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        foodTypeField?.SetValue(quest, foodType);
+
+        switch (foodType)
+        {
+            case EFoodType.Fruit:
+                var fruitField = typeof(DailyQuestSO).GetField("requiredFruitType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                fruitField?.SetValue(quest, fruitType);
+                break;
+            case EFoodType.FastFood:
+                var fastFoodField = typeof(DailyQuestSO).GetField("requiredFastFoodType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                fastFoodField?.SetValue(quest, fastFoodType);
+                break;
+            case EFoodType.Cake:
+                var cakeField = typeof(DailyQuestSO).GetField("requiredCakeType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                cakeField?.SetValue(quest, cakeType);
+                break;
         }
     }
 
@@ -426,23 +554,21 @@ public class DailyQuest_Manager : MonoBehaviour
         if (saveData == null)
             saveData = new DailyQuestSaveData();
 
-        saveData.lastLoginDate = DateTime.Now.ToString("yyyy-MM-dd");
-        saveData.activeQuests.Clear();
+        // Clear previous data
+        saveData.todaysQuests.Clear();
 
-        // Save active quests
+        // Save all active quests
         foreach (var quest in activeDailyQuests)
         {
-            var entry = new DailyQuestSaveEntry(quest.Quest.QuestName, quest.CurrentProgress,
-                quest.IsCompleted, quest.IsRewardClaimed, quest.AssignedDate);
-            saveData.activeQuests.Add(entry);
+            var entry = new DailyQuestSaveEntry(quest);
+            saveData.todaysQuests.Add(entry);
         }
 
-        // Save completed quests (for current day only)
-        foreach (var quest in completedDailyQuests.Where(q => !q.IsExpired))
+        // Save completed quests from today
+        foreach (var quest in completedDailyQuests)
         {
-            var entry = new DailyQuestSaveEntry(quest.Quest.QuestName, quest.CurrentProgress,
-                quest.IsCompleted, quest.IsRewardClaimed, quest.AssignedDate);
-            saveData.activeQuests.Add(entry);
+            var entry = new DailyQuestSaveEntry(quest);
+            saveData.todaysQuests.Add(entry);
         }
 
         DailyQuestSaveSystem.SaveDailyQuestData(saveData);
@@ -481,20 +607,6 @@ public class DailyQuest_Manager : MonoBehaviour
     {
         if (activeDailyQuests.Count == 0) return 0f;
         return activeDailyQuests.Average(q => q.Progress);
-    }
-
-    #endregion
-
-    #region Public Methods
-    public void NotifyNormalQuestCompleted()
-    {
-        foreach (var questProgress in activeDailyQuests.ToList())
-        {
-            if (questProgress.Quest.QuestType == EDailyQuestType.CompleteNormalQuests)
-            {
-                questProgress.AddProgress(1);
-            }
-        }
     }
 
     #endregion

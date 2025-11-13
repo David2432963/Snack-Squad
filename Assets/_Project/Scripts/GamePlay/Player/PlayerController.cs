@@ -3,9 +3,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour, IUpdate, IFixedUpdate
 {
-    [SerializeField] private Animator animator;
+    [SerializeField] private Animator[] animators;
     [SerializeField] private float moveSpeed = 5f;
 
+    private Animator skinAnimator;
     private CharacterController characterController;
     private CharacterEffect characterEffect;
     private Joystick joystick;
@@ -13,20 +14,47 @@ public class PlayerController : MonoBehaviour, IUpdate, IFixedUpdate
     private float currentSpeed;
     private float speedFloat;
     private float deltaTime;
+    private float originalYPos;
+    private Vector3 tempPos;
+    private bool canMove;
 
     private void Awake()
     {
         Main.Mono.Register(this);
+        Main.Observer.Add(EEvent.OnGameStateChange, UpdateState);
+        Main.Observer.Add(EEvent.OnGameOver, OnEndGame);
+        characterController = GetComponent<CharacterController>();
+        characterEffect = GetComponent<CharacterEffect>();
+        // Main.Observer.Add(EEvent.OnJoystickMove, OnJoystickMove);
+    }
+    private void OnJoystickMove(object data)
+    {
+        if (data is Vector2 input)
+        {
+            moveDirection = new Vector3(input.x, 0, input.y);
+        }
     }
     private void Start()
     {
-        characterController = GetComponent<CharacterController>();
-        characterEffect = GetComponent<CharacterEffect>();
         joystick = Main.UI.Get<GamePlayUI>().Joystick;
+        originalYPos = transform.position.y;
+        SetupSkinAnimator();
     }
+    private void SetupSkinAnimator()
+    {
+        skinAnimator = animators[(int)GameData.CurrentSkin - 1];
+        for (int i = 0; i < animators.Length; i++)
+        {
+            animators[i].gameObject.SetActive(false);
+        }
 
+        // Enable only the selected one
+        skinAnimator.gameObject.SetActive(true);
+    }
     public void Tick(float deltaTime)
     {
+        if (!canMove) return;
+        
         this.deltaTime = deltaTime;
         HandleInput();
         HandleSpeed();
@@ -36,6 +64,10 @@ public class PlayerController : MonoBehaviour, IUpdate, IFixedUpdate
     public void FixedTick(float fixedDeltaTime)
     {
         characterController.Move(moveDirection * currentSpeed * fixedDeltaTime);
+
+        tempPos = transform.position;
+        tempPos.y = originalYPos;
+        transform.position = tempPos;
     }
     private void HandleInput()
     {
@@ -51,14 +83,14 @@ public class PlayerController : MonoBehaviour, IUpdate, IFixedUpdate
     {
         if (moveDirection.magnitude > 0.1f && currentSpeed > 0)
         {
-            animator.SetBool("IsRunning", true);
+            skinAnimator.SetBool("IsRunning", true);
         }
         else
         {
-            animator.SetBool("IsRunning", false);
+            skinAnimator.SetBool("IsRunning", false);
         }
         speedFloat = currentSpeed / moveSpeed;
-        animator.SetFloat("MoveSpeed", speedFloat);
+        skinAnimator.SetFloat("MoveSpeed", speedFloat);
     }
     private void HandleLookDirection()
     {
@@ -68,8 +100,28 @@ public class PlayerController : MonoBehaviour, IUpdate, IFixedUpdate
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, deltaTime * 10f);
         }
     }
+    private void UpdateState(object data)
+    {
+        if (data is EGameState state)
+        {
+            canMove = state == EGameState.Playing;
+        }
+    }
+    private void OnEndGame(object data)
+    {
+        if (GamePlay_Manager.Instance.Winner == EPlayerType.Player)
+        {
+            skinAnimator.CrossFade("Cheering", 0.1f);
+        }
+        else
+        {
+            skinAnimator.CrossFade("SadIdle", 0.1f);
+        }
+    }
     private void OnDestroy()
     {
         Main.Mono.UnRegister(this);
+        Main.Observer.Remove(EEvent.OnGameStateChange, UpdateState);
+        Main.Observer.Remove(EEvent.OnGameOver, OnEndGame);
     }
 }

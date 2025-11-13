@@ -6,12 +6,32 @@ using UnityEngine;
 public class DailyQuestSaveData
 {
     [SerializeField] public string lastLoginDate;
-    [SerializeField] public List<DailyQuestSaveEntry> activeQuests = new List<DailyQuestSaveEntry>();
+    [SerializeField] public List<DailyQuestSaveEntry> todaysQuests = new List<DailyQuestSaveEntry>();
 
     public DailyQuestSaveData()
     {
         lastLoginDate = DateTime.Now.ToString("yyyy-MM-dd");
-        activeQuests = new List<DailyQuestSaveEntry>();
+        todaysQuests = new List<DailyQuestSaveEntry>();
+    }
+
+    // Check if the saved data is from today
+    public bool IsFromToday()
+    {
+        if (DateTime.TryParse(lastLoginDate, out DateTime savedDate))
+        {
+            return savedDate.Date == DateTime.Now.Date;
+        }
+        return false;
+    }
+
+    // Clear expired data (from previous days)
+    public void ClearIfExpired()
+    {
+        if (!IsFromToday())
+        {
+            todaysQuests.Clear();
+            lastLoginDate = DateTime.Now.ToString("yyyy-MM-dd");
+        }
     }
 }
 
@@ -22,24 +42,53 @@ public class DailyQuestSaveEntry
     [SerializeField] public int currentProgress;
     [SerializeField] public bool isCompleted;
     [SerializeField] public bool isRewardClaimed;
-    [SerializeField] public string assignedDate;
+    [SerializeField] public string questDate; // Always today for daily quests
+    [SerializeField] public EDailyQuestType questType;
+    [SerializeField] public int targetValue;
+    [SerializeField] public int goldReward;
 
-    public DailyQuestSaveEntry(string questName, int progress, bool completed, bool rewardClaimed, DateTime assignedDate)
+    // For CollectSpecificFood quests
+    [SerializeField] public EFoodType requiredFoodType;
+    [SerializeField] public EFruitType requiredFruitType;
+    [SerializeField] public EFastFoodType requiredFastFoodType;
+    [SerializeField] public ECakeType requiredCakeType;
+
+    public DailyQuestSaveEntry(DailyQuestProgress questProgress)
     {
-        this.questName = questName;
-        this.currentProgress = progress;
-        this.isCompleted = completed;
-        this.isRewardClaimed = rewardClaimed;
-        this.assignedDate = assignedDate.ToString("yyyy-MM-dd");
+        var quest = questProgress.Quest;
+
+        this.questName = quest.QuestName;
+        this.currentProgress = questProgress.CurrentProgress;
+        this.isCompleted = questProgress.IsCompleted;
+        this.isRewardClaimed = questProgress.IsRewardClaimed;
+        this.questDate = DateTime.Now.ToString("yyyy-MM-dd");
+
+        // Save quest properties for recreation
+        this.questType = quest.QuestType;
+        this.targetValue = quest.TargetValue;
+        this.goldReward = quest.GoldReward;
+
+        if (quest.QuestType == EDailyQuestType.CollectSpecificFood)
+        {
+            this.requiredFoodType = quest.RequiredFoodType;
+            this.requiredFruitType = quest.RequiredFruitType;
+            this.requiredFastFoodType = quest.RequiredFastFoodType;
+            this.requiredCakeType = quest.RequiredCakeType;
+        }
     }
 
-    public DateTime GetAssignedDate()
+    public DateTime GetQuestDate()
     {
-        if (DateTime.TryParse(assignedDate, out DateTime date))
+        if (DateTime.TryParse(questDate, out DateTime date))
         {
             return date;
         }
         return DateTime.Now;
+    }
+
+    public bool IsFromToday()
+    {
+        return GetQuestDate().Date == DateTime.Now.Date;
     }
 }
 
@@ -51,13 +100,15 @@ public static class DailyQuestSaveSystem
     {
         try
         {
+            // Always update the date when saving
+            data.lastLoginDate = DateTime.Now.ToString("yyyy-MM-dd");
+
             string jsonData = JsonUtility.ToJson(data, true);
             PlayerPrefs.SetString(SAVE_KEY, jsonData);
             PlayerPrefs.Save();
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            Debug.LogError($"Failed to save daily quest data: {e.Message}");
         }
     }
 
@@ -69,12 +120,17 @@ public static class DailyQuestSaveSystem
             {
                 string jsonData = PlayerPrefs.GetString(SAVE_KEY);
                 DailyQuestSaveData data = JsonUtility.FromJson<DailyQuestSaveData>(jsonData);
-                return data ?? new DailyQuestSaveData();
+
+                if (data != null)
+                {
+                    // Automatically clear data if it's from a previous day
+                    data.ClearIfExpired();
+                    return data;
+                }
             }
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            Debug.LogError($"Failed to load daily quest data: {e.Message}");
         }
 
         return new DailyQuestSaveData();
@@ -89,5 +145,11 @@ public static class DailyQuestSaveSystem
     public static bool HasSaveData()
     {
         return PlayerPrefs.HasKey(SAVE_KEY);
+    }
+
+    public static bool HasTodaysSaveData()
+    {
+        var data = LoadDailyQuestData();
+        return data.IsFromToday() && data.todaysQuests.Count > 0;
     }
 }

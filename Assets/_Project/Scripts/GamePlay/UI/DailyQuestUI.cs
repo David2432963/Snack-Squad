@@ -1,50 +1,56 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using OSK;
 using System.Linq;
+using UnityEngine.UI;
 
 public class DailyQuestUI : View
 {
     [Header("UI References")]
     [SerializeField] private Transform questContainer;
     [SerializeField] private GameObject dailyQuestItemPrefab;
-    [SerializeField] private Transform questItemParent;
-    [SerializeField] private GameObject questItemPrefab;
-    [SerializeField] private Button refreshButton;
-    [SerializeField] private Slider overallProgressSlider;
-    [SerializeField] private TextMeshProUGUI overallProgressText;
+    [SerializeField] private Transform achievementContainer;
+    [SerializeField] private GameObject achievementItemPrefab;
+    [SerializeField] private Button btnClose;
 
     private List<DailyQuestItemUI> questItems = new List<DailyQuestItemUI>();
+    private List<AchievementItemUI> achievementItems = new List<AchievementItemUI>();
     private DailyQuest_Manager dailyQuestManager;
+    private Achievement_Manager achievementManager;
 
     public override void Initialize(RootUI rootUI)
     {
         base.Initialize(rootUI);
 
-        if (refreshButton != null)
-        {
-            refreshButton.onClick.AddListener(OnRefreshButtonClicked);
-        }
-
+        btnClose.onClick.AddListener(Close);
         dailyQuestManager = DailyQuest_Manager.Instance;
+        achievementManager = Achievement_Manager.Instance;
     }
 
     public override void Open(object[] data = null)
     {
         base.Open(data);
 
-        // Get fresh reference to dailyQuestManager in case it wasn't available during Initialize
+        // Get fresh reference to managers in case they weren't available during Initialize
         if (dailyQuestManager == null)
         {
             dailyQuestManager = DailyQuest_Manager.Instance;
+        }
+
+        if (achievementManager == null)
+        {
+            achievementManager = Achievement_Manager.Instance;
         }
 
         // Always refresh UI when opening to get latest data
         if (dailyQuestManager != null)
         {
             RefreshUI();
+        }
+
+        if (achievementManager != null)
+        {
+            RefreshAchievements();
         }
     }
 
@@ -53,19 +59,21 @@ public class DailyQuestUI : View
         base.Hide();
     }
 
-    private void OnDestroy()
+    private void Close()
     {
-        if (refreshButton != null)
-        {
-            refreshButton.onClick.RemoveListener(OnRefreshButtonClicked);
-        }
+        Main.UI.Hide(this);
     }
 
     private void RefreshUI()
     {
         ClearQuestItems();
         CreateQuestItems();
-        UpdateOverallProgress();
+    }
+
+    private void RefreshAchievements()
+    {
+        ClearAchievementItems();
+        CreateAchievementItems();
     }
 
     private void ClearQuestItems()
@@ -80,10 +88,25 @@ public class DailyQuestUI : View
         questItems.Clear();
     }
 
+    private void ClearAchievementItems()
+    {
+        foreach (var item in achievementItems)
+        {
+            if (item != null)
+            {
+                Destroy(item.gameObject);
+            }
+        }
+        achievementItems.Clear();
+    }
+
     private void CreateQuestItems()
     {
         if (dailyQuestManager == null || dailyQuestItemPrefab == null || questContainer == null)
             return;
+
+        // Refresh progress from GameData before creating UI
+        RefreshQuestProgressFromGameData();
 
         var activeQuests = dailyQuestManager.ActiveDailyQuests.ToList();
         var completedQuests = dailyQuestManager.CompletedDailyQuests.ToList();
@@ -101,6 +124,37 @@ public class DailyQuestUI : View
         }
     }
 
+    private void RefreshQuestProgressFromGameData()
+    {
+        if (dailyQuestManager == null) return;
+
+        // Refresh progress for all quests that depend on GameData
+        var allQuests = dailyQuestManager.ActiveDailyQuests.Concat(dailyQuestManager.CompletedDailyQuests).ToList();
+
+        foreach (var questProgress in allQuests)
+        {
+            if (questProgress.Quest.QuestType == EDailyQuestType.CompleteNormalQuests ||
+                questProgress.Quest.QuestType == EDailyQuestType.CollectSpecificFood)
+            {
+                questProgress.RefreshProgressFromGameData();
+            }
+        }
+    }
+
+    private void CreateAchievementItems()
+    {
+        if (achievementManager == null || achievementItemPrefab == null || achievementContainer == null)
+            return;
+
+        var allAchievements = achievementManager.AllAchievements.ToList();
+
+        // Create items for all achievements
+        foreach (var achievement in allAchievements)
+        {
+            CreateAchievementItem(achievement, achievement.IsUnlocked);
+        }
+    }
+
     private void CreateQuestItem(DailyQuestProgress questProgress, bool isCompleted)
     {
         GameObject itemObj = Instantiate(dailyQuestItemPrefab, questContainer);
@@ -113,20 +167,15 @@ public class DailyQuestUI : View
         }
     }
 
-    private void UpdateOverallProgress()
+    private void CreateAchievementItem(AchievementProgress achievementProgress, bool isUnlocked)
     {
-        if (dailyQuestManager == null) return;
+        GameObject itemObj = Instantiate(achievementItemPrefab, achievementContainer);
+        AchievementItemUI achievementItem = itemObj.GetComponent<AchievementItemUI>();
 
-        float progress = dailyQuestManager.GetOverallDailyProgress();
-
-        if (overallProgressSlider != null)
+        if (achievementItem != null)
         {
-            overallProgressSlider.value = progress;
-        }
-
-        if (overallProgressText != null)
-        {
-            overallProgressText.text = $"{Mathf.RoundToInt(progress * 100)}%";
+            achievementItem.Initialize(achievementProgress, isUnlocked);
+            achievementItems.Add(achievementItem);
         }
     }
 
@@ -134,6 +183,7 @@ public class DailyQuestUI : View
     {
         // Manually refresh UI to get latest quest data from manager
         RefreshUI();
+        RefreshAchievements();
     }
 
     #region Public Methods

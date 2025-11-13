@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: QuestCake 2
   m_EditorClassIdentifier: 
   questName: Collecting Cake
-  questDescription: Collect Lemon, Matcha and Berry
+  questDescription: Collect Lemon Cake, Matcha Cake and Berry Cake
   questIcon: {fileID: 0}
   foodType: 3
   itemCount: 3
   selectedSpecificItems: 050000000800000001000000
-  scoreReward: 100
+  scoreReward: 50
   bonusScore: 0

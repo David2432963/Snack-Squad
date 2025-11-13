@@ -13,8 +13,8 @@ public class GameData_Manager : MonoBehaviour
 
     // Individual player score access
     public int GetPlayerScore(EPlayerType playerType) => playerScores.ContainsKey(playerType) ? playerScores[playerType] : 0;
-    public int Bot1Score => GetPlayerScore(EPlayerType.Bot1);
-    public int Bot2Score => GetPlayerScore(EPlayerType.Bot2);
+    public int Bot1Score => GetPlayerScore(EPlayerType.Edward);
+    public int Bot2Score => GetPlayerScore(EPlayerType.Bruce);
 
     // Total score for all players
     public int TotalScore
@@ -47,8 +47,8 @@ public class GameData_Manager : MonoBehaviour
     {
         playerScores.Clear();
         playerScores[EPlayerType.Player] = 0;
-        playerScores[EPlayerType.Bot1] = 0;
-        playerScores[EPlayerType.Bot2] = 0;
+        playerScores[EPlayerType.Edward] = 0;
+        playerScores[EPlayerType.Bruce] = 0;
     }
 
     // Backwards compatibility method for main player
@@ -65,7 +65,7 @@ public class GameData_Manager : MonoBehaviour
             playerScores[playerType] = 0;
         }
 
-        playerScores[playerType] += amount;
+        playerScores[playerType] = Mathf.Max(0, playerScores[playerType] + amount);
 
         // Notify different events based on player type
         switch (playerType)
@@ -73,10 +73,10 @@ public class GameData_Manager : MonoBehaviour
             case EPlayerType.Player:
                 Main.Observer.Notify(EEvent.OnScoreChange, playerScores[playerType]);
                 break;
-            case EPlayerType.Bot1:
+            case EPlayerType.Edward:
                 Main.Observer.Notify(EEvent.OnBot1ScoreChange, playerScores[playerType]);
                 break;
-            case EPlayerType.Bot2:
+            case EPlayerType.Bruce:
                 Main.Observer.Notify(EEvent.OnBot2ScoreChange, playerScores[playerType]);
                 break;
         }

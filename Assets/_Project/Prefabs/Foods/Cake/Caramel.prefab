@@ -53,7 +53,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.5, y: 1, z: 0.5}
+  m_Size: {x: 0.7, y: 1, z: 0.7}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-811087215534330299
 MonoBehaviour:
@@ -67,9 +67,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ac6b9f7badae734bbdb654fca2cdeeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  floatHeight: 0.1
+  floatDuration: 1
   foodType: 3
   point: 10
-  cakeType: 0
+  cakeType: 2
 --- !u!1001 &2237264565620922266
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -141,10 +143,36 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 234804320092747492, guid: 445afcc082f1d3c44abf6d9118b0991c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2372595604123707881}
   m_SourcePrefab: {fileID: 100100000, guid: 445afcc082f1d3c44abf6d9118b0991c, type: 3}
 --- !u!4 &1658940535702682564 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 579242398080216158, guid: 445afcc082f1d3c44abf6d9118b0991c, type: 3}
   m_PrefabInstance: {fileID: 2237264565620922266}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2039687580303073662 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 234804320092747492, guid: 445afcc082f1d3c44abf6d9118b0991c, type: 3}
+  m_PrefabInstance: {fileID: 2237264565620922266}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2372595604123707881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2039687580303073662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 1
+  outlineColor: {r: 0.2509804, g: 1, b: 0.2509804, a: 1}
+  outlineWidth: 1
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []

@@ -31,10 +31,31 @@ public class DailyQuestProgress
     public DailyQuestProgress(DailyQuestSO quest)
     {
         this.quest = quest;
-        this.currentProgress = 0;
         this.isCompleted = false;
         this.isRewardClaimed = false;
         this.assignedDate = DateTime.Now;
+        
+        // Initialize progress based on quest type
+        if (quest.QuestType == EDailyQuestType.CompleteNormalQuests)
+        {
+            // For CompleteNormalQuests, load progress from GameData
+            this.currentProgress = GameData.GetNormalQuestsCompletedToday();
+        }
+        else if (quest.QuestType == EDailyQuestType.CollectSpecificFood)
+        {
+            // For CollectSpecificFood, load progress from GameData
+            this.currentProgress = GetSpecificFoodCollectedCount(quest);
+        }
+        else
+        {
+            this.currentProgress = 0;
+        }
+        
+        // Check if already completed
+        if (currentProgress >= TargetProgress)
+        {
+            CompleteQuest();
+        }
     }
 
     // Constructor for loading from save data
@@ -73,6 +94,55 @@ public class DailyQuestProgress
         {
             CompleteQuest();
         }
+    }
+
+    /// <summary>
+    /// Refreshes progress for CompleteNormalQuests type from GameData
+    /// </summary>
+    public void RefreshProgressFromGameData()
+    {
+        if (quest.QuestType == EDailyQuestType.CompleteNormalQuests)
+        {
+            int currentFromGameData = GameData.GetNormalQuestsCompletedToday();
+            if (currentFromGameData != currentProgress)
+            {
+                SetProgress(currentFromGameData);
+            }
+        }
+        else if (quest.QuestType == EDailyQuestType.CollectSpecificFood)
+        {
+            int currentFromGameData = GetSpecificFoodCollectedCount(quest);
+            if (currentFromGameData != currentProgress)
+            {
+                SetProgress(currentFromGameData);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Gets the current count of collected specific food for this quest from GameData
+    /// </summary>
+    private int GetSpecificFoodCollectedCount(DailyQuestSO quest)
+    {
+        if (quest.QuestType != EDailyQuestType.CollectSpecificFood)
+            return 0;
+            
+        object specificType = null;
+        
+        switch (quest.RequiredFoodType)
+        {
+            case EFoodType.Fruit:
+                specificType = quest.RequiredFruitType;
+                break;
+            case EFoodType.FastFood:
+                specificType = quest.RequiredFastFoodType;
+                break;
+            case EFoodType.Cake:
+                specificType = quest.RequiredCakeType;
+                break;
+        }
+        
+        return GameData.GetDailyFoodCollected(quest.RequiredFoodType, specificType);
     }
 
     private void CompleteQuest()

@@ -7,6 +7,11 @@ public class Menu_Manager : MonoBehaviour
     {
         SingletonManager.Instance.RegisterScene(this);
     }
+    private void Start()
+    {
+        // GameData.Gold += 200;
+        Main.Sound.Play(SoundID.MenuMusic.ToString(), loop: true);
+    }
     public void StartGame()
     {
         Main.Director
@@ -15,6 +20,8 @@ public class Menu_Manager : MonoBehaviour
             .Async(true)
             .OnStart(() =>
             {
+                Main.Sound.StopAll();
+                Main.Sound.DestroyAll();
             }).OnComplete(() =>
             {
                 Main.UI.Get<MainMenuUI>().Hide();

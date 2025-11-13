@@ -1,6 +1,6 @@
 using UnityEngine;
 using Sirenix.OdinInspector;
-using System;
+using OSK;
 
 [CreateAssetMenu(fileName = "New Daily Quest", menuName = "Quest System/Daily Quest")]
 public class DailyQuestSO : ScriptableObject

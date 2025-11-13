@@ -12,7 +12,7 @@ public class QuestProgress
     [SerializeField] private bool isRewardClaimed;
     [SerializeField] private DateTime startTime;
     [SerializeField] private DateTime completionTime;
-    
+
     // For multi-item collection tracking
     [SerializeField] private List<int> collectedSpecificItems = new List<int>();
 
@@ -47,7 +47,7 @@ public class QuestProgress
     public void AddProgress(int amount = 1)
     {
         if (isCompleted) return;
-        
+
         // Since all quests are now specific item collection, this method is mainly for debugging
         currentAmount += amount;
         currentAmount = Mathf.Clamp(currentAmount, 0, TargetAmount);
@@ -59,40 +59,41 @@ public class QuestProgress
             CompleteQuest();
         }
     }
-    
+
     // Main method for specific item collection
     public bool AddSpecificItem(int itemValue)
     {
         if (isCompleted) return false;
-        
+
         // Check if this item is required for the quest
         if (!quest.IsSpecificItemRequired(itemValue))
         {
+            ResetProgress();
             return false; // Item not needed for this quest
         }
-        
+
         // Check if we already collected this specific item
         if (collectedSpecificItems.Contains(itemValue))
         {
             return false; // Already collected this item
         }
-        
+
         // Add the specific item to our collection
         collectedSpecificItems.Add(itemValue);
         currentAmount = collectedSpecificItems.Count;
-        
+
         OnProgressUpdated?.Invoke(this);
-        
+
         Debug.Log($"Collected specific item for quest '{quest.QuestName}': {GetItemName(itemValue)} ({currentAmount}/{TargetAmount})");
 
         if (currentAmount >= TargetAmount && !isCompleted)
         {
             CompleteQuest();
         }
-        
+
         return true;
     }
-    
+
     private string GetItemName(int itemValue)
     {
         switch (quest.RequiredFoodType)
@@ -181,7 +182,7 @@ public class QuestProgress
         }
         return $"{currentAmount}/{TargetAmount}";
     }
-    
+
     // Get detailed progress text for multi-item quests
     public string GetDetailedProgressText()
     {
@@ -189,20 +190,20 @@ public class QuestProgress
         {
             return GetProgressText();
         }
-        
+
         var requiredItems = quest.GetRequiredItemNames();
         var collectedNames = collectedSpecificItems.Select(GetItemName).ToList();
-        
+
         string result = "Required: ";
         for (int i = 0; i < requiredItems.Count; i++)
         {
             bool isCollected = collectedNames.Contains(requiredItems[i]);
             result += isCollected ? $"✓{requiredItems[i]}" : requiredItems[i];
-            
+
             if (i < requiredItems.Count - 1)
                 result += ", ";
         }
-        
+
         return result;
     }
 
@@ -211,7 +212,7 @@ public class QuestProgress
     {
         return Progress * 100f;
     }
-    
+
     // Check if specific item is still needed
     public bool IsSpecificItemNeeded(int itemValue)
     {

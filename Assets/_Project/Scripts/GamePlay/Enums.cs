@@ -1,15 +1,31 @@
+public enum EGameState
+{
+    None = 0,
+    Ready = 1,
+    Playing = 2,
+    Pause = 3,
+    End = 4,
+}
+
 public enum ESkin
 {
-    Mouse = 1,
+    Skin0 = 1,
     Skin1 = 2,
     Skin2 = 3,
+    Skin3 = 4,
+    Skin4 = 5,
+    Skin5 = 6,
+    Skin6 = 7,
+    Skin7 = 8,
+    Skin8 = 9,
+    Skin9 = 10,
 }
 
 public enum EPlayerType
 {
     Player = 0,
-    Bot1 = 1,
-    Bot2 = 2
+    Edward = 1,
+    Bruce = 2
 }
 
 public enum EBadEffect

@@ -46,6 +46,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3252e50b98dca4c9bf0a6a972fe38d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  floatHeight: 0.1
+  floatDuration: 1
   foodType: 1
   point: 10
   fruitType: 2
@@ -68,7 +70,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.4, y: 1, z: 0.4}
+  m_Size: {x: 0.7, y: 1, z: 0.7}
   m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!1001 &2777059027124279642
 PrefabInstance:
@@ -142,11 +144,38 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 65a41c5b935c5440eb002e67749881de, type: 2}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 9500000, guid: d7e0b090270fe4b529e719f42b5c93fc, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 100000, guid: d7e0b090270fe4b529e719f42b5c93fc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7322976385700857132}
   m_SourcePrefab: {fileID: 100100000, guid: d7e0b090270fe4b529e719f42b5c93fc, type: 3}
+--- !u!1 &2777059027124314106 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: d7e0b090270fe4b529e719f42b5c93fc, type: 3}
+  m_PrefabInstance: {fileID: 2777059027124279642}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7322976385700857132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2777059027124314106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 1
+  outlineColor: {r: 0.2509804, g: 1, b: 0.2509804, a: 1}
+  outlineWidth: 1
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!4 &2777059027124667354 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: d7e0b090270fe4b529e719f42b5c93fc, type: 3}

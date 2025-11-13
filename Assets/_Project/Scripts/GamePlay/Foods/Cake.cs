@@ -6,6 +6,14 @@ public class Cake : GoodFood
     [SerializeField] protected ECakeType cakeType;
 
     public ECakeType CakeType => cakeType;
+
+    protected override string spawnedText => $"<color=orange>[Cake]</color> {cakeType}";
+
+    protected override object GetSpecificFoodType()
+    {
+        return cakeType;
+    }
+    
     public override bool MatchType(object type)
     {
         if (type is ECakeType cakeType)

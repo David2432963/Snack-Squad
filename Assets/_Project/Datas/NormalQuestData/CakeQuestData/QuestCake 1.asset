@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: QuestCake 1
   m_EditorClassIdentifier: 
   questName: Collecting Cake
-  questDescription: Collect Caramel, Matcha and Lilac
+  questDescription: Collect Caramel Cake, Matcha Cake and Lilac Cake
   questIcon: {fileID: 0}
   foodType: 3
   itemCount: 3
   selectedSpecificItems: 020000000800000006000000
-  scoreReward: 100
+  scoreReward: 50
   bonusScore: 0

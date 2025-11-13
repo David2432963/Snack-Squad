@@ -6,18 +6,18 @@ public class BadFood : Food
     [SerializeField] private EBadEffect badEffect;
     [SerializeField] private float effectDuration;
 
+    protected override string spawnedText => "<color=red>[BadFood]</color> Chili";
+
     protected override void OnTriggerEnter(Collider other)
     {
-        bool isPlayer = false;
-
         if (other.CompareTag("Player"))
         {
             Main.Observer.Notify(EEvent.OnBadFoodCollected, this);
+            Main.Sound.Play(SoundID.BadFood.ToString());
             if (badEffect == EBadEffect.Slow)
             {
                 other.GetComponent<CharacterEffect>()?.Slow(effectDuration);
             }
-            isPlayer = true;
         }
         else if (other.CompareTag("Bot"))
         {
@@ -26,12 +26,9 @@ public class BadFood : Food
             {
                 other.GetComponent<CharacterEffect>()?.Slow(effectDuration);
             }
-            isPlayer = true;
         }
 
-        if (isPlayer)
-        {
-            base.OnTriggerEnter(other);
-        }
+
+        base.OnTriggerEnter(other);
     }
 }

@@ -18,5 +18,5 @@ MonoBehaviour:
   foodType: 2
   itemCount: 3
   selectedSpecificItems: 080000000900000004000000
-  scoreReward: 100
+  scoreReward: 50
   bonusScore: 0

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using OSK;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -18,7 +19,8 @@ public class FoodSpawner : MonoBehaviour
     private int currentBadFoodCount;
     private List<Tile> emptyTiles = new();
     private List<Food> foodPrefabs = new();
-    private List<Food> spawnedFoods = new();
+    private List<GoodFood> spawnedGoodFoods = new();
+    private List<BadFood> spawnedBadFoods = new();
 
     // Session food type tracking
     private EFoodType sessionFoodType;
@@ -26,15 +28,16 @@ public class FoodSpawner : MonoBehaviour
 
     // Public access to spawned foods
     public static FoodSpawner Instance => SingletonManager.Instance.Get<FoodSpawner>();
-    public IReadOnlyList<Food> SpawnedFoods => spawnedFoods.AsReadOnly();
+    public IReadOnlyList<Food> SpawnedFoods => spawnedGoodFoods.AsReadOnly();
     public EFoodType SessionFoodType => sessionFoodType;
 
 
     private void Awake()
     {
         SingletonManager.Instance.RegisterScene(this);
-        Main.Observer.Add(EEvent.OnGoodFoodCollected, OnRemoveFood);
+        Main.Observer.Add(EEvent.OnGoodFoodCollected, OnRemoveGoodFood);
         Main.Observer.Add(EEvent.OnBadFoodCollected, OnRemoveBadFood);
+        Main.Observer.Add(EEvent.OnGameOver, OnEndGame);
     }
     private void Start()
     {
@@ -104,23 +107,12 @@ public class FoodSpawner : MonoBehaviour
         {
             int random = Random.Range(0, emptyTiles.Count);
             var foodPrefab = foodPrefabs[Random.Range(0, foodPrefabs.Count)];
-            var food = Main.Pool.Spawn(KEY_POOL.KEY_POOL_DEFAULT_CONTAINER, foodPrefab, transform);
+            var food = Main.Pool.Spawn(KEY_POOL.KEY_POOL_DEFAULT_CONTAINER, foodPrefab.gameObject, transform).GetComponent<GoodFood>();
             emptyTiles[random].AddFood(food);
             emptyTiles.RemoveAt(random);
-            spawnedFoods.Add(food);
+            spawnedGoodFoods.Add(food);
 
             currentGoodFoodCount++;
-        }
-    }
-
-    private void SpawnBadFood()
-    {
-        foreach (var tile in tiles)
-        {
-            var foodPrefab = badFoodPrefabs[Random.Range(0, badFoodPrefabs.Length)];
-            var food = Main.Pool.Spawn(KEY_POOL.KEY_POOL_DEFAULT_CONTAINER, foodPrefab, transform);
-            tile.AddFood(food);
-            spawnedFoods.Add(food);
         }
     }
 
@@ -149,14 +141,15 @@ public class FoodSpawner : MonoBehaviour
             }
 
             CheckEmptyTiles();
+            SpawnQuestFood();
             if (currentGoodFoodCount < maxGoodFoodToSpawn && emptyTiles.Count > 0)
             {
                 int random = Random.Range(0, emptyTiles.Count);
                 var foodPrefab = foodPrefabs[Random.Range(0, foodPrefabs.Count)];
-                var food = Main.Pool.Spawn(KEY_POOL.KEY_POOL_DEFAULT_CONTAINER, foodPrefab, transform);
+                var food = Main.Pool.Spawn(KEY_POOL.KEY_POOL_DEFAULT_CONTAINER, foodPrefab.gameObject, transform).GetComponent<GoodFood>();
                 emptyTiles[random].AddFood(food);
                 emptyTiles.RemoveAt(random);
-                spawnedFoods.Add(food);
+                spawnedGoodFoods.Add(food);
 
                 currentGoodFoodCount++;
             }
@@ -164,14 +157,105 @@ public class FoodSpawner : MonoBehaviour
             {
                 int random = Random.Range(0, emptyTiles.Count);
                 var foodPrefab = badFoodPrefabs[Random.Range(0, badFoodPrefabs.Length)];
-                var food = Main.Pool.Spawn(KEY_POOL.KEY_POOL_DEFAULT_CONTAINER, foodPrefab, transform);
+                var food = Main.Pool.Spawn(KEY_POOL.KEY_POOL_DEFAULT_CONTAINER, foodPrefab.gameObject, transform).GetComponent<BadFood>();
                 emptyTiles[random].AddFood(food);
                 emptyTiles.RemoveAt(random);
-                spawnedFoods.Add(food);
+                spawnedBadFoods.Add(food);
 
                 currentBadFoodCount++;
             }
-            yield return new WaitForSeconds(Random.Range(1f, 2f));
+            yield return new WaitForSeconds(Random.Range(0.5f, 1.5f));
+        }
+    }
+
+    private List<int> questFoods = new();
+    private void SpawnQuestFood()
+    {
+        if (!foodTypeInitialized)
+        {
+            return;
+        }
+
+        if (foodPrefabs.Count == 0)
+        {
+            return;
+        }
+
+        if (emptyTiles.Count == 0)
+        {
+            return;
+        }
+
+        questFoods = Quest_Manager.Instance.ActiveQuests[0].Quest.SelectedSpecificItems.ToList();
+        EFoodType questFoodType = Quest_Manager.Instance.ActiveQuests[0].Quest.RequiredFoodType;
+
+        switch (questFoodType)
+        {
+            case EFoodType.Fruit:
+                foreach (var item in spawnedGoodFoods)
+                {
+                    int fruitId = (int)((Fruit)item).FruitType;
+                    if (questFoodType == item.FoodType && questFoods.Contains(fruitId))
+                    {
+                        questFoods.Remove(fruitId);
+                        break;
+                    }
+                }
+                break;
+            case EFoodType.FastFood:
+                foreach (var item in spawnedGoodFoods)
+                {
+                    int fastFoodId = (int)((FastFood)item).FastFoodType;
+                    if (questFoodType == item.FoodType && questFoods.Contains(fastFoodId))
+                    {
+                        questFoods.Remove(fastFoodId);
+                        break;
+                    }
+                }
+                break;
+            case EFoodType.Cake:
+                foreach (var item in spawnedGoodFoods)
+                {
+                    int cakeId = (int)((Cake)item).CakeType;
+                    if (questFoodType == item.FoodType && questFoods.Contains(cakeId))
+                    {
+                        questFoods.Remove(cakeId);
+                        break;
+                    }
+                }
+                break;
+        }
+
+        for (int i = 0; i < questFoods.Count; i++)
+        {
+            int random = Random.Range(0, emptyTiles.Count);
+            if (questFoodType == EFoodType.Fruit)
+            {
+                var foodPrefab = fruitsPrefabs.FirstOrDefault(f => (int)f.FruitType == questFoods[i]);
+                var food = Main.Pool.Spawn(KEY_POOL.KEY_POOL_DEFAULT_CONTAINER, foodPrefab.gameObject, transform).GetComponent<GoodFood>();
+                emptyTiles[random].AddFood(food);
+                emptyTiles.RemoveAt(random);
+                spawnedGoodFoods.Add(food);
+                currentGoodFoodCount++;
+            }
+            else if (questFoodType == EFoodType.FastFood)
+            {
+                var foodPrefab = fastFoodPrefabs.FirstOrDefault(f => (int)f.FastFoodType == questFoods[i]);
+                var food = Main.Pool.Spawn(KEY_POOL.KEY_POOL_DEFAULT_CONTAINER, foodPrefab.gameObject, transform).GetComponent<GoodFood>();
+                emptyTiles[random].AddFood(food);
+                emptyTiles.RemoveAt(random);
+                spawnedGoodFoods.Add(food);
+                currentGoodFoodCount++;
+            }
+            else if (questFoodType == EFoodType.Cake)
+            {
+                var foodPrefab = cakePrefabs.FirstOrDefault(f => (int)f.CakeType == questFoods[i]);
+                var food = Main.Pool.Spawn(KEY_POOL.KEY_POOL_DEFAULT_CONTAINER, foodPrefab.gameObject, transform).GetComponent<GoodFood>();
+                emptyTiles[random].AddFood(food);
+                emptyTiles.RemoveAt(random);
+                spawnedGoodFoods.Add(food);
+                currentGoodFoodCount++;
+            }
         }
     }
 
@@ -186,6 +270,9 @@ public class FoodSpawner : MonoBehaviour
             case EFoodType.FastFood:
                 foods = fastFoodPrefabs;
                 break;
+            case EFoodType.Cake:
+                foods = cakePrefabs;
+                break;
         }
 
         foreach (var tile in tiles)
@@ -193,43 +280,35 @@ public class FoodSpawner : MonoBehaviour
             var foodPrefab = foods[Random.Range(0, foods.Length)];
             var food = Main.Pool.Spawn(KEY_POOL.KEY_POOL_DEFAULT_CONTAINER, foodPrefab, transform);
             tile.AddFood(food);
-            spawnedFoods.Add(food);
+            spawnedGoodFoods.Add((GoodFood)food);
         }
     }
-
-    private void OnRemoveFood(object data)
+    private void OnEndGame(object data)
     {
-        Food food = null;
+        StopCoroutine(nameof(IECheckSpawnFood));
+    }
 
-        // Handle new FoodCollectionData format
+    private void OnRemoveGoodFood(object data)
+    {
         if (data is FoodCollectionData collectionData)
         {
-            food = collectionData.food;
-        }
-        // Handle legacy Food format for backward compatibility
-        else if (data is Food legacyFood)
-        {
-            food = legacyFood;
-        }
-
-        if (food != null)
-        {
-            spawnedFoods.Remove(food);
+            spawnedGoodFoods.Remove(collectionData.food);
         }
         currentGoodFoodCount--;
     }
     private void OnRemoveBadFood(object data)
     {
-        if (data is Food food)
+        if (data is BadFood food)
         {
-            spawnedFoods.Remove(food);
+            spawnedBadFoods.Remove(food);
         }
         currentBadFoodCount--;
     }
 
     private void OnDestroy()
     {
-        Main.Observer.Remove(EEvent.OnGoodFoodCollected, OnRemoveFood);
+        Main.Observer.Remove(EEvent.OnGoodFoodCollected, OnRemoveGoodFood);
         Main.Observer.Remove(EEvent.OnBadFoodCollected, OnRemoveBadFood);
+        Main.Observer.Remove(EEvent.OnGameOver, OnEndGame);
     }
 }

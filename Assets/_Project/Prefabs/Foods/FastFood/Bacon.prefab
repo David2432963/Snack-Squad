@@ -46,6 +46,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1cd1ece5c11edc4ca1bcf467ee10997, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  floatHeight: 0.1
+  floatDuration: 1
   foodType: 2
   point: 10
   fastFoodType: 1
@@ -68,7 +70,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.5, y: 1, z: 0.2}
+  m_Size: {x: 0.7, y: 1, z: 0.7}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &2495121471988112677
 PrefabInstance:
@@ -130,14 +132,39 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bacon
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: -8178084579226064474, guid: 032a461b615af7f4f93f4e629f3d5459, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4037687048092208996, guid: 032a461b615af7f4f93f4e629f3d5459, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5818724560353121435}
   m_SourcePrefab: {fileID: 100100000, guid: 032a461b615af7f4f93f4e629f3d5459, type: 3}
 --- !u!4 &1288906442203859195 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3693917438728672734, guid: 032a461b615af7f4f93f4e629f3d5459, type: 3}
   m_PrefabInstance: {fileID: 2495121471988112677}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1921010881860620865 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4037687048092208996, guid: 032a461b615af7f4f93f4e629f3d5459, type: 3}
+  m_PrefabInstance: {fileID: 2495121471988112677}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5818724560353121435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1921010881860620865}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 1
+  outlineColor: {r: 0.2509804, g: 1, b: 0.2509804, a: 1}
+  outlineWidth: 1
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []

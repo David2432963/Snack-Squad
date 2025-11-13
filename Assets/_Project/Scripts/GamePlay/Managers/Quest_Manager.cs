@@ -32,7 +32,7 @@ public class Quest_Manager : MonoBehaviour
     private void Awake()
     {
         SingletonManager.Instance.RegisterScene(this);
-        Main.Observer.Add(EEvent.OnGoodFoodCollected, OnGoodFoodCollected);
+        Main.Observer.Add(EEvent.OnPlayerCollectFood, OnGoodFoodCollected);
         Main.Observer.Add(EEvent.OnSessionFoodTypeSelected, OnSessionFoodTypeSelected);
 
         if (questDatas == null || questDatas.Length == 0)
@@ -85,7 +85,8 @@ public class Quest_Manager : MonoBehaviour
     private void OnDestroy()
     {
         // Unsubscribe from events
-        Main.Observer.Remove(EEvent.OnGoodFoodCollected, OnGoodFoodCollected);
+        Main.Observer.Remove(EEvent.OnPlayerCollectFood, OnGoodFoodCollected);
+        Main.Observer.Remove(EEvent.OnSessionFoodTypeSelected, OnSessionFoodTypeSelected);
 
         // Unsubscribe from quest events
         foreach (var quest in activeQuests)
@@ -209,11 +210,8 @@ public class Quest_Manager : MonoBehaviour
 
         Main.Observer.Notify(EEvent.OnQuestCompleted, questProgress);
 
-        // Notify daily quest system about completed normal quest
-        if (DailyQuest_Manager.Instance != null)
-        {
-            DailyQuest_Manager.Instance.NotifyNormalQuestCompleted();
-        }
+        // Notify daily quest system about completed normal quest through GameData
+        GameData.AddNormalQuestCompleted();
 
         // Auto-assign new quest if enabled - but only assign ONE quest to prevent cascading
         if (autoAssignQuests && activeQuests.Count < maxActiveQuests && sessionQuests.Length > 0)
@@ -253,11 +251,9 @@ public class Quest_Manager : MonoBehaviour
 
     private void ProcessFoodCollection(GoodFood food)
     {
-        EFoodType foodType = food.FoodType;
-
         foreach (var questProgress in activeQuests.ToList())
         {
-            if (questProgress.Quest.RequiredFoodType == foodType)
+            if (questProgress.Quest.RequiredFoodType == food.FoodType)
             {
                 int specificItemValue = GetSpecificItemValue(food);
 

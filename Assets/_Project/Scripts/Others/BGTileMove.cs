@@ -16,7 +16,6 @@ public class BGTileMove : MonoBehaviour, IFixedUpdate
 
     public void FixedTick(float fixedDeltaTime)
     {
-        // bg.uvRect = new Rect(bg.uvRect.position + new Vector2(-1, 0) * fixedDeltaTime, bg.uvRect.size);
         HPDebug.Log("BG Move Fixed Tick");
         bg.material.mainTextureOffset += -direction.normalized * fixedDeltaTime * speed;
     }

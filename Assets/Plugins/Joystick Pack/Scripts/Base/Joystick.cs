@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using OSK;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -81,10 +82,10 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         if (magnitude > deadZone)
         {
             if (magnitude > 1)
-                input = normalised;
+                SetInput(normalised);
         }
         else
-            input = Vector2.zero;
+            SetInput(Vector2.zero);
     }
 
     private void FormatInput()
@@ -131,7 +132,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
 
     public virtual void OnPointerUp(PointerEventData eventData)
     {
-        input = Vector2.zero;
+        SetInput(Vector2.zero);
         handle.anchoredPosition = Vector2.zero;
     }
 
@@ -144,6 +145,12 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
             return localPoint - (background.anchorMax * baseRect.sizeDelta) + pivotOffset;
         }
         return Vector2.zero;
+    }
+
+    private void SetInput(Vector2 value)
+    {
+        input = value;
+        Main.Observer.Notify(EEvent.OnJoystickMove, input);
     }
 }
 

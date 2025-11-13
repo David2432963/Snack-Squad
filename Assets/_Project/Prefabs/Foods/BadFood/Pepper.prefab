@@ -67,6 +67,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3437c0e843ae3b1458d95e8db71bf858, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  floatHeight: 0.1
+  floatDuration: 1
+  point: -10
   badEffect: 1
   effectDuration: 5
 --- !u!1001 &6096702800456894452

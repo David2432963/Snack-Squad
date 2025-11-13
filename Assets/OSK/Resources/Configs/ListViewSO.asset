@@ -21,6 +21,24 @@ MonoBehaviour:
     isRemoveOnHide: 0
     depth: 0
     view: {fileID: -4382670027449277547, guid: 231d3d6d601e17c4bb0acbe0a37a1447, type: 3}
+  - path: UI/DailyQuest.prefab
+    viewType: 0
+    isPreloadSpawn: 1
+    isRemoveOnHide: 0
+    depth: 0
+    view: {fileID: 3747694682283515925, guid: 14e082e2c190d294e951027b0eb07aca, type: 3}
+  - path: UI/SettingUI.prefab
+    viewType: 1
+    isPreloadSpawn: 1
+    isRemoveOnHide: 0
+    depth: 0
+    view: {fileID: 4640302375575332755, guid: 095d130e93f25fb47b471855a378161d, type: 3}
+  - path: UI/TutorialUI.prefab
+    viewType: 0
+    isPreloadSpawn: 1
+    isRemoveOnHide: 0
+    depth: 0
+    view: {fileID: 4047025230260413828, guid: 98ba6cc156543ac42a78d6e889adb55f, type: 3}
   - path: UI/GameplayUI.prefab
     viewType: 0
     isPreloadSpawn: 1

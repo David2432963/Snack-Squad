@@ -9,7 +9,6 @@ public class AchievementSO : ScriptableObject
     [SerializeField] private string achievementId;
     [SerializeField] private string achievementName;
     [SerializeField, TextArea(2, 4)] private string description;
-    [SerializeField] private Sprite icon;
 
     [Title("Achievement Requirements")]
     [SerializeField] private EAchievementType achievementType;
@@ -25,13 +24,11 @@ public class AchievementSO : ScriptableObject
 
     [Title("Achievement Rewards")]
     [SerializeField] private int goldReward;
-    [SerializeField] private bool isHidden; // Hidden until unlocked
 
     // Properties
     public string AchievementId => achievementId;
     public string AchievementName => achievementName;
     public string Description => description;
-    public Sprite Icon => icon;
     public EAchievementType AchievementType => achievementType;
     public int TargetValue => targetValue;
     public EFoodType RequiredFoodType => requiredFoodType;
@@ -39,7 +36,6 @@ public class AchievementSO : ScriptableObject
     public EFastFoodType RequiredFastFoodType => requiredFastFoodType;
     public ECakeType RequiredCakeType => requiredCakeType;
     public int GoldReward => goldReward;
-    public bool IsHidden => isHidden;
 
     private void OnValidate()
     {
@@ -64,11 +60,11 @@ public class AchievementSO : ScriptableObject
         {
             case EAchievementType.CollectSpecificFood:
                 string foodName = GetSpecificFoodName();
-                description = $"Collect {targetValue} {foodName} items";
+                description = $"Collect {targetValue} {foodName} foods";
                 achievementName = $"{foodName} Master";
                 break;
             case EAchievementType.CompleteQuests:
-                description = $"Complete {targetValue} quests";
+                description = $"Complete {targetValue} quests in game";
                 achievementName = $"Quest Hero {targetValue}";
                 break;
         }

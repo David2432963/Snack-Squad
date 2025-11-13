@@ -23,14 +23,11 @@ public class Achievement_Manager : MonoBehaviour
 
     private void Awake()
     {
-        SingletonManager.Instance.RegisterGlobal(this);
+        SingletonManager.Instance.RegisterScene(this);
     }
 
     private void Start()
     {
-        // Subscribe to game events for achievement tracking
-        SubscribeToGameEvents();
-
         // Load achievements from assets if needed
         if (availableAchievements == null || availableAchievements.Length == 0)
         {
@@ -40,29 +37,15 @@ public class Achievement_Manager : MonoBehaviour
         // Initialize achievement system
         InitializeAchievements();
         LoadAchievementProgress();
+        
+        // Update achievement progress from GameData
+        UpdateAchievementProgressFromGameData();
     }
 
     private void OnDestroy()
     {
-        UnsubscribeFromGameEvents();
         SaveAchievementProgress();
     }
-
-    #region Event Subscriptions
-
-    private void SubscribeToGameEvents()
-    {
-        Main.Observer.Add(EEvent.OnGoodFoodCollected, OnFoodCollected);
-        Main.Observer.Add(EEvent.OnQuestCompleted, OnQuestCompleted);
-    }
-
-    private void UnsubscribeFromGameEvents()
-    {
-        Main.Observer.Remove(EEvent.OnGoodFoodCollected, OnFoodCollected);
-        Main.Observer.Remove(EEvent.OnQuestCompleted, OnQuestCompleted);
-    }
-
-    #endregion
 
     #region Achievement Management
 
@@ -106,52 +89,7 @@ public class Achievement_Manager : MonoBehaviour
         }
     }
 
-    #endregion
-
-    #region Event Handlers
-
-    private void OnFoodCollected(object data)
-    {
-        if (data is FoodCollectionData collectionData)
-        {
-            if (collectionData.playerType == EPlayerType.Player)
-            {
-                ProcessFoodCollection(collectionData.food);
-            }
-        }
-        else if (data is GoodFood food)
-        {
-            ProcessFoodCollection(food);
-        }
-    }
-
-    private void ProcessFoodCollection(GoodFood food)
-    {
-        // Update GameData for food tracking
-        object specificType = null;
-        switch (food.FoodType)
-        {
-            case EFoodType.Fruit:
-                if (food is Fruit fruitFood)
-                    specificType = fruitFood.FruitType;
-                break;
-            case EFoodType.FastFood:
-                if (food is FastFood fastFood)
-                    specificType = fastFood.FastFoodType;
-                break;
-            case EFoodType.Cake:
-                if (food is Cake cakeFood)
-                    specificType = cakeFood.CakeType;
-                break;
-        }
-
-        GameData.AddFoodCollected(food.FoodType, specificType);
-
-        // Update achievements
-        UpdateFoodAchievements(food, specificType);
-    }
-
-    private void UpdateFoodAchievements(GoodFood food, object specificType)
+    private void UpdateAchievementProgressFromGameData()
     {
         foreach (var achievement in allAchievements)
         {
@@ -160,51 +98,40 @@ public class Achievement_Manager : MonoBehaviour
             switch (achievement.Achievement.AchievementType)
             {
                 case EAchievementType.CollectSpecificFood:
-                    if (achievement.Achievement.RequiredFoodType == food.FoodType)
-                    {
-                        bool matches = CheckSpecificFoodMatch(achievement.Achievement, food, specificType);
-                        if (matches)
-                        {
-                            int collected = GameData.GetFoodCollected(food.FoodType, specificType);
-                            achievement.SetProgress(collected);
-                        }
-                    }
+                    UpdateSpecificFoodAchievement(achievement);
+                    break;
+                    
+                case EAchievementType.CompleteQuests:
+                    achievement.SetProgress(GameData.TotalQuestsCompleted);
                     break;
             }
         }
     }
 
-    private bool CheckSpecificFoodMatch(AchievementSO achievement, GoodFood food, object specificType)
+    private void UpdateSpecificFoodAchievement(AchievementProgress achievement)
     {
-        switch (achievement.RequiredFoodType)
+        var achievementSO = achievement.Achievement;
+        int collected = 0;
+
+        switch (achievementSO.RequiredFoodType)
         {
             case EFoodType.Fruit:
-                return specificType is EFruitType fruitType && 
-                       achievement.RequiredFruitType == fruitType;
+                collected = GameData.GetFoodCollected(EFoodType.Fruit, achievementSO.RequiredFruitType);
+                break;
             case EFoodType.FastFood:
-                return specificType is EFastFoodType fastFoodType && 
-                       achievement.RequiredFastFoodType == fastFoodType;
+                collected = GameData.GetFoodCollected(EFoodType.FastFood, achievementSO.RequiredFastFoodType);
+                break;
             case EFoodType.Cake:
-                return specificType is ECakeType cakeType && 
-                       achievement.RequiredCakeType == cakeType;
+                collected = GameData.GetFoodCollected(EFoodType.Cake, achievementSO.RequiredCakeType);
+                break;
         }
-        return false;
+
+        achievement.SetProgress(collected);
     }
 
-    private void OnQuestCompleted(object data)
-    {
-        GameData.TotalQuestsCompleted++;
-        
-        foreach (var achievement in allAchievements)
-        {
-            if (achievement.IsUnlocked) continue;
-            
-            if (achievement.Achievement.AchievementType == EAchievementType.CompleteQuests)
-            {
-                achievement.SetProgress(GameData.TotalQuestsCompleted);
-            }
-        }
-    }
+    #endregion
+
+    #region Event Handlers
 
     private void HandleAchievementProgressUpdated(AchievementProgress progress)
     {
@@ -315,6 +242,13 @@ public class Achievement_Manager : MonoBehaviour
     {
         if (allAchievements.Count == 0) return 0f;
         return (float)GetUnlockedCount() / GetTotalCount() * 100f;
+    }
+
+    [Button("Refresh Achievement Progress")]
+    public void RefreshAchievementProgress()
+    {
+        UpdateAchievementProgressFromGameData();
+        Debug.Log("Achievement progress refreshed from GameData!");
     }
 
     [Button("Clear Achievement Data")]

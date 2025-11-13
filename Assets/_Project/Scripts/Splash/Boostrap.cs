@@ -1,6 +1,5 @@
 using DG.Tweening;
 using OSK;
-using UnityEngine;
 
 public class Boostrap : GameInit
 {
@@ -8,13 +7,6 @@ public class Boostrap : GameInit
     {
         SingletonManager.Instance.RegisterScene(this);
         DOVirtual.DelayedCall(0.1f, StartLoading);
-    }
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            StartLoading();
-        }
     }
 
     private void StartLoading()

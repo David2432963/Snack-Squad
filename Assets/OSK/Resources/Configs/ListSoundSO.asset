@@ -13,7 +13,71 @@ MonoBehaviour:
   m_Name: ListSoundSO
   m_EditorClassIdentifier: 
   showSoundSettings: 1
-  filePathSoundID: Assets
+  filePathSoundID: Assets/_Project/Scripts/Others/SoundID.cs
   maxCapacityMusic: 5
   maxCapacitySFX: 25
-  _listSoundInfos: []
+  _listSoundInfos:
+  - id: IngameMusic
+    audioClip: {fileID: 8300000, guid: df5ebdb367b4e9a4ca8dbc9ba13dd9e7, type: 3}
+    type: 0
+    volume: 1
+    pitch:
+      min: 1
+      max: 1
+    group: Music
+  - id: MenuMusic
+    audioClip: {fileID: 8300000, guid: 0f81ecd39ff070a42b3c572988cc3568, type: 3}
+    type: 0
+    volume: 1
+    pitch:
+      min: 1
+      max: 1
+    group: Music
+  - id: click_ui
+    audioClip: {fileID: 8300000, guid: 3d70a71b5f74a6f458d548b08a367d1e, type: 3}
+    type: 1
+    volume: 1
+    pitch:
+      min: 1
+      max: 1
+    group: UI
+  - id: CollectItem
+    audioClip: {fileID: 8300000, guid: a9ad7237f1e4a764bbab9b45c5628c5d, type: 3}
+    type: 1
+    volume: 0.65000004
+    pitch:
+      min: 1
+      max: 1
+    group: Game
+  - id: Win
+    audioClip: {fileID: 8300000, guid: a9c4a5f6ee738ea47821a5dd8e459fa7, type: 3}
+    type: 1
+    volume: 1
+    pitch:
+      min: 1
+      max: 1
+    group: Game
+  - id: BadFood
+    audioClip: {fileID: 8300000, guid: 0d419088c5676474b81813d85b139788, type: 3}
+    type: 1
+    volume: 1
+    pitch:
+      min: 1
+      max: 1
+    group: Game
+  - id: Count
+    audioClip: {fileID: 8300000, guid: c0a6d81b7b541f746bf2ccad7fff8641, type: 3}
+    type: 1
+    volume: 1
+    pitch:
+      min: 1
+      max: 1
+    group: UI
+  - id: Go
+    audioClip: {fileID: 8300000, guid: 00cfadac0b0c65f47b488de3c1abbd7d, type: 3}
+    type: 1
+    volume: 1
+    pitch:
+      min: 1
+      max: 1
+    group: Game

@@ -21,8 +21,8 @@ public class GameOverUI : View
 
     [Header("Reward Settings")]
     [SerializeField] private int baseGoldReward = 10;
-    [SerializeField] private int firstPlaceBonus = 50;
-    [SerializeField] private int secondPlaceBonus = 20;
+    [SerializeField] private int firstPlaceBonus = 30;
+    [SerializeField] private int secondPlaceBonus = 15;
     [SerializeField] private int thirdPlaceBonus = 5;
 
     private int totalGoldEarned = 0;
@@ -49,15 +49,15 @@ public class GameOverUI : View
 
         // Get all scores
         int playerScore = gameDataManager.GetPlayerScore(EPlayerType.Player);
-        int bot1Score = gameDataManager.GetPlayerScore(EPlayerType.Bot1);
-        int bot2Score = gameDataManager.GetPlayerScore(EPlayerType.Bot2);
+        int bot1Score = gameDataManager.GetPlayerScore(EPlayerType.Edward);
+        int bot2Score = gameDataManager.GetPlayerScore(EPlayerType.Bruce);
 
         // Create player data list for ranking
         var playerData = new List<(string name, int score, EPlayerType type)>
         {
             ("Player", playerScore, EPlayerType.Player),
-            ("Bot 1", bot1Score, EPlayerType.Bot1),
-            ("Bot 2", bot2Score, EPlayerType.Bot2)
+            ("Bot 1", bot1Score, EPlayerType.Edward),
+            ("Bot 2", bot2Score, EPlayerType.Bruce)
         };
 
         // Sort by score (descending)
@@ -108,8 +108,8 @@ public class GameOverUI : View
     {
         var gameDataManager = GameData_Manager.Instance;
         int playerScore = gameDataManager.GetPlayerScore(EPlayerType.Player);
-        int bot1Score = gameDataManager.GetPlayerScore(EPlayerType.Bot1);
-        int bot2Score = gameDataManager.GetPlayerScore(EPlayerType.Bot2);
+        int bot1Score = gameDataManager.GetPlayerScore(EPlayerType.Edward);
+        int bot2Score = gameDataManager.GetPlayerScore(EPlayerType.Bruce);
 
         int playerRank = GetPlayerRanking(playerScore, bot1Score, bot2Score);
 
@@ -119,10 +119,6 @@ public class GameOverUI : View
         // Rank bonus
         int rankBonus = GetRankBonus(playerRank);
         totalGoldEarned += rankBonus;
-
-        // Score bonus (1 gold per 10 points)
-        int scoreBonus = playerScore / 10;
-        totalGoldEarned += scoreBonus;
 
         // Display rewards
         if (txtGoldReward != null)
